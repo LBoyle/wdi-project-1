@@ -1,0 +1,26 @@
+Othello
+to start with the mvp will be two player, the goal is to make a computer player.
+this can be done easily in the DOM without using a canvas or some lib
+
+basically mvp will be coloured tiles that change when clicked, easy,
+then checking if moves are legal, which ones need to flip,
+declare winner if no legal moves left, just count up which player has more.
+
+
+create 8 x 8 (64) divs, display inline-block, add to main(canvas),
+could alternatively use an Array of Arrays and check indexes,
+--have a linear Array of 64 for the divs? to assign black or white later;
+create and add any other elements,
+event listeners,
+  if move is legal - check with function,
+  base all checks on the div that was clicked, e.target or this,
+    if (count % 2 === 0) ? black : white; alternate,
+      Array[i] addClass black or white or something
+      if the move is legal, some enemy tile will have to flip,
+      can just change some classes,
+
+
+
+reset button can just refresh the page to avoid the problems I had with tictactoe
+lol
+^^^^^^^^^^^^ this is the plan at Second commit

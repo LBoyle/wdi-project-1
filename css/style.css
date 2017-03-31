@@ -1,3 +1,24 @@
 body {
   background-color: salmon;
+  text-align: center;
+  font-family: sans-serif;
+}
+main {
+  width: 416px;
+  height: 416px;
+  margin: 0 auto;
+  background-color: rgb(64, 85, 34);
+}
+.box {
+  margin: 0 0 -4px 0;
+  height: 50px;
+  width: 50px;
+  border: 1px solid black;
+  display: inline-block;
+}
+.B {
+  background-color: black;
+}
+.W {
+  background-color: white;
 }
