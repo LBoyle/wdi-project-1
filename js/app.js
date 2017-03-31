@@ -18,7 +18,7 @@ $(() => {
   //}; // will eventually use a double loop to create these I guess
 
   function createBoard() {
-    console.log('worked');
+    console.log('Initialized');
     const $body = $('body');
     const $header = $(document.createElement('h1'));
     $header.text('Othello');
@@ -46,15 +46,47 @@ $(() => {
     $('.box').on('click', clickHandler);
   }
   function clickHandler(e) {
+    // if this box hasn't been clicked yet
     if (!$(e.target).hasClass('clicked')) {
-      count++;
-      console.log(`click count is ${count}`);
-      if (count === 0 || count%2 === 0) {
-        $(e.target).addClass('W clicked');
-      } else {
-        $(e.target).addClass('B clicked');
+      if (/*isLegal(e)*/true) {
+        isLegal(e);
+        count++;
+        // console.log(`click count is ${count}`);
+        if (count === 0 || count%2 === 0) {
+          $(e.target).addClass('W clicked');
+        } else {
+          $(e.target).addClass('B clicked');
+        }
+        // captureFunction goes here inside isLegal conditional
       }
     }
+  }
+
+  function isLegal(e) {
+    //return (checkRow(e) || checkCol(e) || checkDiag(e)) ? true : false;
+    checkRow(e);
+    checkCol(e);
+    checkDiag(e);
+  }
+  function checkRow(e) {
+    const thisSq = e.target.id.split('');
+    const current = winCons[thisSq[0]][i];
+    for (var i = 0; i < winCons[thisSq[0]].length; i++) {
+      const prev = winCons[thisSq[0]][i-1];
+      const next = winCons[thisSq[0]][i+1];
+      if ((current !== prev && current !== next)&&(prev !== 'N' || next !== 'N')) {
+        return console.log('legal move');
+      } else {
+        return console.log('illegal move');
+      }
+    }
+    return console.log(thisSq);
+  }
+  function checkCol(e) {
+    const thisSq = e.target.id.split('');
+  }
+  function checkDiag(e) {
+    const thisSq = e.target.id.split('');
   }
 
   createBoard();
