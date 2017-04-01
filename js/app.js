@@ -99,29 +99,45 @@ $(() => {
     // I mean to get rid of the check for W or B, but not bother just yet
     if (current === 'W') {
       if (
-        (next === 'B' || prev === 'B' && next2 === 'W' || prev2 === 'W')||(
+          next === 'B' || prev === 'B' && next2 === 'W' || prev2 === 'W'
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'B' || prev === 'B')&&
           (next2 === 'B' || prev2 === 'B')&&
           (next3 === 'W' || prev3 === 'W')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'B' || prev === 'B')&&
           (next2 === 'B' || prev2 === 'B')&&
           (next3 === 'B' || prev3 === 'B')&&
           (next4 === 'W' || prev4 === 'W')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'B' || prev === 'B')&&
           (next2 === 'B' || prev2 === 'B')&&
           (next3 === 'B' || prev3 === 'B')&&
           (next4 === 'B' || prev4 === 'B')&&
           (next5 === 'W' || prev5 === 'W')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'B' || prev === 'B')&&
           (next2 === 'B' || prev2 === 'B')&&
           (next3 === 'B' || prev3 === 'B')&&
           (next4 === 'B' || prev4 === 'B')&&
           (next5 === 'B' || prev5 === 'B')&&
           (next6 === 'W' || prev6 === 'W')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'B' || prev === 'B')&&
           (next2 === 'B' || prev2 === 'B')&&
           (next3 === 'B' || prev3 === 'B')&&
@@ -129,35 +145,48 @@ $(() => {
           (next5 === 'B' || prev5 === 'B')&&
           (next6 === 'B' || prev6 === 'B')&&
           (next7 === 'W' || prev7 === 'W')
-        )
-      ) {
+        ) {
         legal = true;
       }
-    } else {
+    } else /* Middle of main conditional */ {
+      if (next === 'W' || prev === 'W' && next2 === 'B' || prev2 === 'B') {
+        legal = true;
+      }
       if (
-        (next === 'W' || prev === 'W' && next2 === 'B' || prev2 === 'B')||(
           (next === 'W' || prev === 'W')&&
           (next2 === 'W' || prev2 === 'W')&&
           (next3 === 'B' || prev3 === 'B')
-        )||(
-          (next === 'W' || prev === 'W')&&
-          (next2 === 'W' || prev2 === 'W')&&
-          (next3 === 'W' || prev3 === 'W')&&
-          (next4 === 'B' || prev4 === 'B')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
+        (next === 'W' || prev === 'W')&&
+        (next2 === 'W' || prev2 === 'W')&&
+        (next3 === 'W' || prev3 === 'W')&&
+        (next4 === 'B' || prev4 === 'B')
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'W' || prev === 'W')&&
           (next2 === 'W' || prev2 === 'W')&&
           (next3 === 'W' || prev3 === 'W')&&
           (next4 === 'W' || prev4 === 'W')&&
           (next5 === 'B' || prev5 === 'B')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'W' || prev === 'W')&&
           (next2 === 'W' || prev2 === 'W')&&
           (next3 === 'W' || prev3 === 'W')&&
           (next4 === 'W' || prev4 === 'W')&&
           (next5 === 'W' || prev5 === 'W')&&
           (next6 === 'B' || prev6 === 'B')
-        )||(
+        ) {
+        legal = true;
+      }
+      if (
           (next === 'W' || prev === 'W')&&
           (next2 === 'W' || prev2 === 'W')&&
           (next3 === 'W' || prev3 === 'W')&&
@@ -165,11 +194,10 @@ $(() => {
           (next5 === 'W' || prev5 === 'W')&&
           (next6 === 'W' || prev6 === 'W')&&
           (next7 === 'B' || prev7 === 'B')
-        )
-      ) {
+        ) {
         legal = true;
       }
-    }
+    } /*End of main conditional*/
     //}
     console.log(legal);
     // return legal;
