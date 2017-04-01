@@ -1,7 +1,7 @@
 $(() => {
   // N not assigned, B black, W white
   const keys = ['a','b','c','d','e','f','g','h'];
-  var boardModel = {};
+  const boardModel = {};
   let count = 0;
   //var boardModel = {
   //  this is what the starting board looks like
@@ -51,66 +51,80 @@ $(() => {
       const row = e.target.id.split('')[0];
       const col = parseInt(e.target.id.split('')[1]);
       console.log(row, col);
-      if (/*isLegal(e)*/true) {
-        count++;
-        // console.log(`click count is ${count}`);
-        if (count === 0 || count%2 === 0) {
-          isLegal(e, row, col, 'W');
-          boardModel[row][col] = 'W';
-          $(e.target).addClass('W clicked');
-        } else {
-          isLegal(e, row, col, 'B');
-          boardModel[row][col] = 'B';
-          $(e.target).addClass('B clicked');
-        }
-        // captureFunction goes here inside isLegal conditional
+      count++;
+      // console.log(`click count is ${count}`);
+      if (count === 0 || count%2 === 0) {
+//        if (isLegal(e, row, col, 'W')) {
+        isLegal(e, row, col, 'W');
+        boardModel[row][col] = 'W';
+        $(e.target).addClass('W clicked');
+//        }
+      } else {
+//        if (isLegal(e, row, col, 'B')) {
+        isLegal(e, row, col, 'B');
+        boardModel[row][col] = 'B';
+        $(e.target).addClass('B clicked');
+//        }
       }
+      // captureFunction goes here inside isLegal conditional
     }
   }
 
   function isLegal(e, row, col, current) {
     //return (checkRow(e) || checkCol(e) || checkDiag(e)) ? true : false;
     checkRow(e, row, col, current);
-    checkCol(e, row, col);
-    checkDiag(e, row, col);
+    checkCol(e, row, col, current);
+    checkDiag(e, row, col, current);
   }
+  // so I couldn't really plan this checkRow function, first one I wrote
+  // I used the console to get small piece working at a time
   function checkRow(e, row, col, current) {
     let legal = false;
     const prev = boardModel[row][col-1];
     const prev2 = boardModel[row][col-2];
     const next = boardModel[row][col+1];
     const next2 = boardModel[row][col+2];
-    console.log(prev2, prev, current, next, next2);
     if (next === undefined) { // Right edge
       if (current === 'W') {
-        if (prev === 'B') {
+        if (prev === 'B' && prev2 === 'W') {
           legal = true;
         }
       } else {
-        if (prev === 'W') {
+        if (prev === 'W' && prev2 === 'B') {
           legal = true;
         }
       }
     } else if(prev === undefined) { // Left edge
       if (current === 'W') {
-        if (next === 'B') {
+        if (next === 'B' && next2 === 'W') {
           legal = true;
         }
       } else {
-        if (next === 'W') {
+        if (next === 'W' && next2 === 'B') {
           legal = true;
         }
       }
     } else { // Not the edge
+      console.log(prev2, prev, current, next, next2);
       console.log('not the edge');
+      if (current === 'W') {
+        if ((next === 'B' || prev === 'B')&&(next2 === 'W' || prev2 === 'W')) {
+          legal = true;
+        }
+      } else {
+        if ((next === 'W' || prev === 'W')&&(next2 === 'B' || prev2 === 'B')) {
+          legal = true;
+        }
+      }
     }
     console.log(legal);
+    // return legal;
   }
-  function checkCol(e, row, col) {
-    const current = e.target.id.split('');
+  function checkCol(e, row, col, current) {
+
   }
-  function checkDiag(e, row, col) {
-    const current = e.target.id.split('');
+  function checkDiag(e, row, col, current) {
+
   }
 
   createBoard();
