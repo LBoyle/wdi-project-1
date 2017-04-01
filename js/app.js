@@ -3,17 +3,18 @@ $(() => {
   const keys = ['a','b','c','d','e','f','g','h'];
   const boardModel = {};
   let count = 0;
+  const chipsToFlip = [];
   //var boardModel = {
   //  this is what the starting board looks like
   //  I'm keeping it here for my working, to visualise the board
-    // 'a': ['N','N','N','N','N','N','N','N'],
-    // 'b': ['N','N','N','N','N','N','N','N'],
-    // 'c': ['N','N','N','N','N','N','N','N'],
-    // 'd': ['N','N','N','W','B','N','N','N'],
-    // 'e': ['N','N','N','B','W','N','N','N'],
-    // 'f': ['N','N','N','N','N','N','N','N'],
-    // 'g': ['N','N','N','N','N','N','N','N'],
-    // 'h': ['N','N','N','N','N','N','N','N']
+  // 'a': ['N','N','N','N','N','N','N','N'],
+  // 'b': ['N','N','N','N','N','N','N','N'],
+  // 'c': ['N','N','N','N','N','N','N','N'],
+  // 'd': ['N','N','N','W','B','N','N','N'],
+  // 'e': ['N','N','N','B','W','N','N','N'],
+  // 'f': ['N','N','N','N','N','N','N','N'],
+  // 'g': ['N','N','N','N','N','N','N','N'],
+  // 'h': ['N','N','N','N','N','N','N','N']
   //   //     0   1   2   3   4   5   6   7
   // }; // will eventually use a double loop to create these I guess
 
@@ -54,17 +55,19 @@ $(() => {
       count++;
       // console.log(`click count is ${count}`);
       if (count === 0 || count%2 === 0) {
-        //if (isLegal(e, row, col, 'W')) {
-          isLegal(e, row, col, 'W');
+        if (isLegal(e, row, col, 'W')) {
+        // isLegal(e, row, col, 'W');
           boardModel[row][col] = 'W';
+          $(e.target).removeClass('N');
           $(e.target).addClass('W clicked');
-        //}
+        }
       } else {
-        //if (isLegal(e, row, col, 'B')) {
-          isLegal(e, row, col, 'B');
+        if (isLegal(e, row, col, 'B')) {
+        // isLegal(e, row, col, 'B');
           boardModel[row][col] = 'B';
+          $(e.target).removeClass('N');
           $(e.target).addClass('B clicked');
-        //}
+        }
       }
       // captureFunction goes here inside isLegal conditional
     }
@@ -79,6 +82,7 @@ $(() => {
     const tlTobrNextData = [];
     const blTotrPrevData = [];
     const blTotrNextData = [];
+    // 7 because I don't add the square you just clicked
     for (let i=0; i<7; i++) {
       // for the Row, trying to read from a Dict with
       // dict[foo][outside range or undefined] returns undefined
@@ -96,105 +100,138 @@ $(() => {
       blTotrPrevData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
       blTotrNextData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
     }
-    console.log('prev row: '+prevRowData);
-    console.log('next row: '+nextRowData);
-    console.log('prev col: '+prevColData);
-    console.log('next col: '+nextColData);
-    console.log('prev tl to br: '+tlTobrPrevData);
-    console.log('next tl to br: '+tlTobrNextData);
-    console.log('prev bl to tr: '+blTotrPrevData);
-    console.log('next bl to tr: '+blTotrNextData);
     if (
       // only one of these must return true for player to place
       // I can now use the same one function to check all directions
-      checkBoard(e, row, col, current, prevRowData, nextRowData)||
-      checkBoard(e, row, col, current, prevColData, nextColData)||
-      checkBoard(e, row, col, current, tlTobrPrevData, tlTobrNextData)||
-      checkBoard(e, row, col, current, blTotrPrevData, blTotrNextData)
+      checkBoard(e, row, col, current, prevRowData, nextRowData, 'h')||
+      checkBoard(e, row, col, current, prevColData, nextColData, 'v')||
+      checkBoard(e, row, col, current, tlTobrPrevData, tlTobrNextData, 'd1')||
+      checkBoard(e, row, col, current, blTotrPrevData, blTotrNextData, 'd2')
     ) {
       return true;
     } else {
       return false;
     }
   }
-  // I've rigged this function to do horizontal or vertical checks based on input
-  function checkBoard(e, row, col, current, prev, next) {
+  // I've rigged this function to do horizontal, vertical or diagonal checks based on input
+  function checkBoard(e, row, col, player, prev, next, plane) {
     let legal = false;
-    // I mean to get rid of the W or B conditional, but not bother just yet
-    if (current === 'W') {
-      if (
-          (next[0] === 'B' && next[1] === 'W') || (prev[0] === 'B' && prev[1] === 'W')
-        ) {
-        legal = true;
+    let enemy = '';
+    if (player === 'B') {
+      enemy = 'W';
+    }else {
+      enemy = 'B';
+    }
+    if (next[0] === enemy && next[1] === player) {
+      legal = true;
+      pushChips(plane, 1, 'pos');
+    }
+    if (prev[0] === enemy && prev[1] === player) {
+      legal = true;
+      pushChips(plane, 1, 'neg');
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === player) {
+      legal = true;
+      pushChips(plane, 2, 'pos');
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === player) {
+      legal = true;
+      pushChips(plane, 2, 'neg');
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === player) {
+      legal = true;
+      pushChips(plane, 3, 'pos');
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === player) {
+      legal = true;
+      pushChips(plane, 3, 'neg');
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === player) {
+      legal = true;
+      pushChips(plane, 4, 'pos');
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === player) {
+      legal = true;
+      pushChips(plane, 4, 'neg');
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === player) {
+      legal = true;
+      pushChips(plane, 5, 'pos');
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === player) {
+      legal = true;
+      pushChips(plane, 5, 'neg');
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === enemy && next[6] === player) {
+      legal = true;
+      pushChips(plane, 6, 'pos');
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === enemy && prev[6] === player) {
+      legal = true;
+      pushChips(plane, 6, 'neg');
+    }
+    function pushChips(plane, num, dir) {
+      // num is number of blocks to be taken
+      for (let i=0; i<num; i++) {
+        if (plane === 'h') {
+          if (dir === 'neg') {
+            chipsToFlip.push('#'+row+(col-(i+1)).toString());
+            boardModel[row][col-(i+1)] = player;
+          }
+          if (dir === 'pos') {
+            chipsToFlip.push('#'+row+(col+(i+1)).toString());
+            boardModel[row][col+(i+1)] = player;
+          }
+        }
+        if (plane === 'v') {
+          if (dir === 'neg') {
+            chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col).toString());
+            boardModel[keys[keys.indexOf(row)-(i+1)]][col] = player;
+          }
+          if (dir === 'pos') {
+            chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col).toString());
+            boardModel[keys[keys.indexOf(row)+(i+1)]][col] = player;
+          }
+        }
+        if (plane === 'd1') {
+          if (dir === 'neg') {
+            chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col-(i+1)).toString());
+            boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] = player;
+          }
+          if (dir === 'pos') {
+            chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col+(i+1)).toString());
+            boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] = player;
+          }
+        }
+        if (plane === 'd2') {
+          if (dir === 'neg') {
+            chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col-(i+1)).toString());
+            boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] = player;
+          }
+          if (dir === 'pos') {
+            chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col+(i+1)).toString());
+            boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] = player;
+          }
+        }
       }
-      if (
-          (next[0] === 'B' && next[1] === 'B' && next[2] === 'W')||
-          (prev[0] === 'B' && prev[1] === 'B' && prev[2] === 'W')
-        ) {
-        legal = true;
+    }
+    // I figure I'll change the colors in this function
+    // rather than make a whole new function, the data is already here to work with
+    if (legal) {
+      for (let i=0; i<chipsToFlip.length; i++) {
+        if (!$(chipsToFlip[i]).hasClass('N')) {
+          $(chipsToFlip[i]).removeClass(enemy);
+          $(chipsToFlip[i]).addClass(player);
+          console.log(chipsToFlip[i]);
+        }
       }
-      if (
-          (next[0] === 'B' && next[1] === 'B' && next[2] === 'B' && next[3] === 'W')||
-          (prev[0] === 'B' && prev[1] === 'B' && prev[2] === 'B' && prev[3] === 'W')
-        ) {
-        legal = true;
+      for (let i=chipsToFlip.length; i>=0; i--) {
+        chipsToFlip.pop([i]);
       }
-      if (
-          (next[0] === 'B' && next[1] === 'B' && next[2] === 'B' && next[3] === 'B' && next[4] === 'W')||
-          (prev[0] === 'B' && prev[1] === 'B' && prev[2] === 'B' && prev[3] === 'B' && prev[4] === 'W')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'B' && next[1] === 'B' && next[2] === 'B' && next[3] === 'B' && next[4] === 'B' && next[5] === 'W')||
-          (prev[0] === 'B' && prev[1] === 'B' && prev[2] === 'B' && prev[3] === 'B' && prev[4] === 'B' && prev[5] === 'W')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'B' && next[1] === 'B' && next[2] === 'B' && next[3] === 'B' && next[4] === 'B' && next[5] === 'B' && next[6] === 'W')||
-          (prev[0] === 'B' && prev[1] === 'B' && prev[2] === 'B' && prev[3] === 'B' && prev[4] === 'B' && prev[5] === 'B' && prev[6] === 'W')
-        ) {
-        legal = true;
-      }
-    } else /* Middle of main conditional */ {
-      if (
-          (next[0] === 'W' && next[1] === 'B') || (prev[0] === 'W' && prev[1] === 'B')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'W' && next[1] === 'W' && next[2] === 'B')||
-          (prev[0] === 'W' && prev[1] === 'W' && prev[2] === 'B')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'W' && next[1] === 'W' && next[2] === 'W' && next[3] === 'B')||
-          (prev[0] === 'W' && prev[1] === 'W' && prev[2] === 'W' && prev[3] === 'B')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'W' && next[1] === 'W' && next[2] === 'W' && next[3] === 'W' && next[4] === 'B')||
-          (prev[0] === 'W' && prev[1] === 'W' && prev[2] === 'W' && prev[3] === 'W' && prev[4] === 'B')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'W' && next[1] === 'W' && next[2] === 'W' && next[3] === 'W' && next[4] === 'W' && next[5] === 'B')||
-          (prev[0] === 'W' && prev[1] === 'W' && prev[2] === 'W' && prev[3] === 'W' && prev[4] === 'W' && prev[5] === 'B')
-        ) {
-        legal = true;
-      }
-      if (
-          (next[0] === 'W' && next[1] === 'W' && next[2] === 'W' && next[3] === 'W' && next[4] === 'W' && next[5] === 'W' && next[6] === 'B')||
-          (prev[0] === 'W' && prev[1] === 'W' && prev[2] === 'W' && prev[3] === 'W' && prev[4] === 'W' && prev[5] === 'W' && prev[6] === 'B')
-        ) {
-        legal = true;
-      }
-    } /*End of main conditional*/
-    //}
+    } else {
+      count-=2;
+    }
+    console.log(chipsToFlip);
     console.log(legal);
     return legal;
   } // end of function
