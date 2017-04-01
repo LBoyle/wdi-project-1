@@ -1,5 +1,6 @@
 body {
-  background-color: salmon;
+  background-image: url("file:///Users/louis/Development/wdi-project-1/img/wood-table-bg.jpg");
+  background-color: #B8860B;
   text-align: center;
   font-family: sans-serif;
 }
@@ -22,11 +23,10 @@ main {
 .W {
   background-color: white;
 }
-.scoreLeft {
+.scoreLeft, .scoreRight {
   display: inline-block;
   width: 200px;
-}
-.scoreRight {
-  display: inline-block;
-  width: 200px;
+  margin: 20px 10px 0 10px;
+  border: 1px solid black;
+  border-radius: 10px;
 }

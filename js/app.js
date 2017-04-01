@@ -1,3 +1,4 @@
+var othello = othello || {};
 $(() => {
   // N not assigned, B black, W white
   const keys = ['a','b','c','d','e','f','g','h'];
@@ -7,6 +8,8 @@ $(() => {
   let legal;
   let blackTaken = 0;
   let whiteTaken = 0;
+  let blackTiles = 0;
+  let whiteTiles = 0;
   const $counterL = $(document.createElement('p'));
   const $counterR = $(document.createElement('p'));
   //var boardModel = {
@@ -40,8 +43,8 @@ $(() => {
     $titleRight.text('White, go second');
     $scoreLeft.append($titleLeft);
     $scoreRight.append($titleRight);
-    $counterL.text('Score: '+whiteTaken);
-    $counterR.text('Score: '+blackTaken);
+    $counterL.text('Tiles: 2 Taken: '+blackTaken);
+    $counterR.text('Tiles: 2 Taken: '+whiteTaken);
     $scoreLeft.append($counterL);
     $scoreRight.append($counterR);
     const $main = $(document.createElement('main'));
@@ -80,12 +83,15 @@ $(() => {
         if (legal === true) {
           boardModel[row][col] = 'W';
           doFlip('B','W');
+          whiteTiles = numTiles('W');
+          blackTiles = numTiles('B');
           $(e.target).removeClass('N');
           $(e.target).addClass('W clicked');
           legal = false;
           $('.left').text('Black, Your turn');
           $('.right').text('White team');
-          $counterR.text('Score: '+blackTaken);
+          $counterR.text('Tiles: '+whiteTiles+' Taken: '+blackTaken);
+          $counterL.text('Tiles: '+blackTiles+' Taken: '+whiteTaken);
         } else {
           count--;
         }
@@ -94,12 +100,16 @@ $(() => {
         if (legal === true) {
           boardModel[row][col] = 'B';
           doFlip('W','B');
+          blackTiles = numTiles('B');
+          whiteTiles = numTiles('W');
+          console.log(blackTiles, whiteTiles);
           $(e.target).removeClass('N');
           $(e.target).addClass('B clicked');
           legal = false;
           $('.right').text('White, Your turn');
           $('.left').text('Black team');
-          $counterL.text('Score: '+whiteTaken);
+          $counterL.text('Tiles: '+blackTiles+' Taken: '+whiteTaken);
+          $counterR.text('Tiles: '+whiteTiles+' Taken: '+blackTaken);
         } else {
           count--;
         }
@@ -188,6 +198,20 @@ $(() => {
       }
     } // end of loop
   } // end of pushChips function
+
+  function numTiles(player) {
+    let num = 0;
+    for (var i=0; i<keys.length; i++) {
+      for (var j=0; j<boardModel[keys[i]].length; j++) {
+        if (boardModel[keys[i]][j] === player) {
+          num += 1;
+          console.log(num);
+        }
+      }
+      //console.log(boardModel[keys[i]]);
+    }
+    return num;
+  }
 
   function doFlip(enemy, player) {
     for (let i=0; i<chipsToFlip.length; i++) {
