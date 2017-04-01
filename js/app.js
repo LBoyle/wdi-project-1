@@ -1,21 +1,21 @@
 $(() => {
   // N not assigned, B black, W white
   const keys = ['a','b','c','d','e','f','g','h'];
-  let winCons = {};
+  var boardModel = {};
   let count = 0;
-  //var winCons = {
+  //var boardModel = {
   //  this is what the starting board looks like
   //  I'm keeping it here for my working, to visualise the board
-    // 'a': ['N','N','N','N','N','N','N','N'],
-    // 'b': ['N','N','N','N','N','N','N','N'],
-    // 'c': ['N','N','N','N','N','N','N','N'],
-    // 'd': ['N','N','N','W','B','N','N','N'],
-    // 'e': ['N','N','N','B','W','N','N','N'],
-    // 'f': ['N','N','N','N','N','N','N','N'],
-    // 'g': ['N','N','N','N','N','N','N','N'],
-    // 'h': ['N','N','N','N','N','N','N','N']
-    //        0   1   2   3   4   5   6   7
-  //}; // will eventually use a double loop to create these I guess
+  //   'a': ['N','N','N','N','N','N','N','N'],
+  //   'b': ['N','N','N','N','N','N','N','N'],
+  //   'c': ['N','N','N','N','N','N','N','N'],
+  //   'd': ['N','N','N','W','B','N','N','N'],
+  //   'e': ['N','N','N','B','W','N','N','N'],
+  //   'f': ['N','N','N','N','N','N','N','N'],
+  //   'g': ['N','N','N','N','N','N','N','N'],
+  //   'h': ['N','N','N','N','N','N','N','N']
+  //   //     0   1   2   3   4   5   6   7
+  // }; // will eventually use a double loop to create these I guess
 
   function createBoard() {
     console.log('Initialized');
@@ -24,17 +24,17 @@ $(() => {
     $header.text('Othello');
     const $main = $(document.createElement('main'));
     for (var i=0; i<keys.length; i++) {
-      winCons[keys[i]] = [];
+      boardModel[keys[i]] = [];
       for (var j=0; j<8; j++) {
         const $box = $(document.createElement('div'));
         $box.addClass('box');
         $box.attr('id', `${keys[i]}${j}`);
-        winCons[keys[i]][j] = 'N';
+        boardModel[keys[i]][j] = 'N';
         if ((keys[i] === 'd' && j === 4)||(keys[i] === 'e' && j === 3)) {
-          winCons[keys[i]][j] = 'B';
+          boardModel[keys[i]][j] = 'B';
           $box.addClass('B clicked');
         } else if ((keys[i] === 'd' && j === 3)||(keys[i] === 'e' && j === 4)) {
-          winCons[keys[i]][j] = 'W';
+          boardModel[keys[i]][j] = 'W';
           $box.addClass('W clicked');
         } else {
           $box.addClass('N');
@@ -48,13 +48,19 @@ $(() => {
   function clickHandler(e) {
     // if this box hasn't been clicked yet
     if (!$(e.target).hasClass('clicked')) {
+      const row = e.target.id.split('')[0];
+      const col = parseInt(e.target.id.split('')[1]);
+      console.log(row, col);
       if (/*isLegal(e)*/true) {
-        isLegal(e);
         count++;
         // console.log(`click count is ${count}`);
         if (count === 0 || count%2 === 0) {
+          isLegal(e, row, col, 'W');
+          boardModel[row][col] = 'W';
           $(e.target).addClass('W clicked');
         } else {
+          isLegal(e, row, col, 'B');
+          boardModel[row][col] = 'B';
           $(e.target).addClass('B clicked');
         }
         // captureFunction goes here inside isLegal conditional
@@ -62,31 +68,49 @@ $(() => {
     }
   }
 
-  function isLegal(e) {
+  function isLegal(e, row, col, current) {
     //return (checkRow(e) || checkCol(e) || checkDiag(e)) ? true : false;
-    checkRow(e);
-    checkCol(e);
-    checkDiag(e);
+    checkRow(e, row, col, current);
+    checkCol(e, row, col);
+    checkDiag(e, row, col);
   }
-  function checkRow(e) {
-    const thisSq = e.target.id.split('');
-    const current = winCons[thisSq[0]][i];
-    for (var i = 0; i < winCons[thisSq[0]].length; i++) {
-      const prev = winCons[thisSq[0]][i-1];
-      const next = winCons[thisSq[0]][i+1];
-      if ((current !== prev && current !== next)&&(prev !== 'N' || next !== 'N')) {
-        return console.log('legal move');
+  function checkRow(e, row, col, current) {
+    let legal = false;
+    const prev = boardModel[row][col-1];
+    const prev2 = boardModel[row][col-2];
+    const next = boardModel[row][col+1];
+    const next2 = boardModel[row][col+2];
+    console.log(prev2, prev, current, next, next2);
+    if (next === undefined) { // Right edge
+      if (current === 'W') {
+        if (prev === 'B') {
+          legal = true;
+        }
       } else {
-        return console.log('illegal move');
+        if (prev === 'W') {
+          legal = true;
+        }
       }
+    } else if(prev === undefined) { // Left edge
+      if (current === 'W') {
+        if (next === 'B') {
+          legal = true;
+        }
+      } else {
+        if (next === 'W') {
+          legal = true;
+        }
+      }
+    } else { // Not the edge
+      console.log('not the edge');
     }
-    return console.log(thisSq);
+    console.log(legal);
   }
-  function checkCol(e) {
-    const thisSq = e.target.id.split('');
+  function checkCol(e, row, col) {
+    const current = e.target.id.split('');
   }
-  function checkDiag(e) {
-    const thisSq = e.target.id.split('');
+  function checkDiag(e, row, col) {
+    const current = e.target.id.split('');
   }
 
   createBoard();
