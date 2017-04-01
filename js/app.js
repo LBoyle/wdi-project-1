@@ -54,17 +54,17 @@ $(() => {
       count++;
       // console.log(`click count is ${count}`);
       if (count === 0 || count%2 === 0) {
-        if (isLegal(e, row, col, 'W')) {
-          //isLegal(e, row, col, 'W');
+        //if (isLegal(e, row, col, 'W')) {
+          isLegal(e, row, col, 'W');
           boardModel[row][col] = 'W';
           $(e.target).addClass('W clicked');
-        }
+        //}
       } else {
-        if (isLegal(e, row, col, 'B')) {
-          //isLegal(e, row, col, 'B');
+        //if (isLegal(e, row, col, 'B')) {
+          isLegal(e, row, col, 'B');
           boardModel[row][col] = 'B';
           $(e.target).addClass('B clicked');
-        }
+        //}
       }
       // captureFunction goes here inside isLegal conditional
     }
@@ -75,6 +75,10 @@ $(() => {
     const nextRowData = [];
     const prevColData = [];
     const nextColData = [];
+    const tlTobrPrevData = [];
+    const tlTobrNextData = [];
+    const blTotrPrevData = [];
+    const blTotrNextData = [];
     for (let i=0; i<7; i++) {
       // for the Row, trying to read from a Dict with
       // dict[foo][outside range or undefined] returns undefined
@@ -85,15 +89,28 @@ $(() => {
       // produces an error so I had to check each one individually
       prevColData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col] : undefined);
       nextColData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col] : undefined);
+      // this gets confusing
+      // can you believe it works though!?
+      tlTobrPrevData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
+      tlTobrNextData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
+      blTotrPrevData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
+      blTotrNextData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
     }
     console.log('prev row: '+prevRowData);
     console.log('next row: '+nextRowData);
     console.log('prev col: '+prevColData);
     console.log('next col: '+nextColData);
-    if ( // only one of these must return true for player to place
-      checkRowOrCol(e, row, col, current, prevRowData, nextRowData)||
-      checkRowOrCol(e, row, col, current, prevColData, nextColData)||
-      checkDiag(e, row, col, current)
+    console.log('prev tl to br: '+tlTobrPrevData);
+    console.log('next tl to br: '+tlTobrNextData);
+    console.log('prev bl to tr: '+blTotrPrevData);
+    console.log('next bl to tr: '+blTotrNextData);
+    if (
+      // only one of these must return true for player to place
+      // I can now use the same one function to check all directions
+      checkBoard(e, row, col, current, prevRowData, nextRowData)||
+      checkBoard(e, row, col, current, prevColData, nextColData)||
+      checkBoard(e, row, col, current, tlTobrPrevData, tlTobrNextData)||
+      checkBoard(e, row, col, current, blTotrPrevData, blTotrNextData)
     ) {
       return true;
     } else {
@@ -101,7 +118,7 @@ $(() => {
     }
   }
   // I've rigged this function to do horizontal or vertical checks based on input
-  function checkRowOrCol(e, row, col, current, prev, next) {
+  function checkBoard(e, row, col, current, prev, next) {
     let legal = false;
     // I mean to get rid of the W or B conditional, but not bother just yet
     if (current === 'W') {
@@ -181,10 +198,6 @@ $(() => {
     console.log(legal);
     return legal;
   } // end of function
-
-  function checkDiag(e, row, col, current) {
-
-  }
 
   createBoard();
 });
