@@ -1,21 +1,28 @@
 body {
-  background-image: url("file:///Users/louis/Development/wdi-project-1/img/wood-table-bg.jpg");
+  background-image: url("http://static.tumblr.com/5964c3521b78dc6bde5abc3305b18f9a/7h0sds4/bMxmtka8w/tumblr_static_tabletop1.9.7.13.jpg");
   background-color: #B8860B;
+
   text-align: center;
   font-family: sans-serif;
 }
 main {
   width: 416px;
   height: 416px;
-  margin: 0 auto;
+  margin: 0 auto 10px auto;
   background-color: rgb(64, 85, 34);
+  border: 3px solid rgb(60,40,20);
+  border-radius: 10px;
 }
 .box {
   margin: 0 0 -4px 0;
   height: 50px;
   width: 50px;
   border: 1px solid black;
+  border-radius: 5px;
   display: inline-block;
+}
+.N:hover {
+  background-color: rgba(40, 50, 20, 0.8);
 }
 .B {
   background-color: black;
@@ -25,8 +32,22 @@ main {
 }
 .scoreLeft, .scoreRight {
   display: inline-block;
-  width: 200px;
+  width: 195px;
   margin: 20px 10px 0 10px;
-  border: 1px solid black;
+  background-color: rgb(64, 85, 34);
+  border: 3px solid rgb(60,40,20);
   border-radius: 10px;
+}
+@media screen and (max-width: 500px) {
+  main {
+    width: 369px;
+    height: 369px;
+  }
+  .box {
+    width: 44px;
+    height: 44px;
+  }
+  .scoreLeft, .scoreRight {
+    width: 166px;
+  }
 }
