@@ -5,9 +5,13 @@ $(() => {
   let count = 0;
   const chipsToFlip = [];
   let legal;
+  let blackTaken = 0;
+  let whiteTaken = 0;
+  const $counterL = $(document.createElement('p'));
+  const $counterR = $(document.createElement('p'));
   //var boardModel = {
   //  this is what the starting board looks like
-  //  I'm keeping it here for my working, to visualise the board
+  //  I'm keeping it here to help visualise the board
   // 'a': ['N','N','N','N','N','N','N','N'],
   // 'b': ['N','N','N','N','N','N','N','N'],
   // 'c': ['N','N','N','N','N','N','N','N'],
@@ -17,13 +21,29 @@ $(() => {
   // 'g': ['N','N','N','N','N','N','N','N'],
   // 'h': ['N','N','N','N','N','N','N','N']
   //   //     0   1   2   3   4   5   6   7
-  // }; // will eventually use a double loop to create these I guess
+  // };
 
   function createBoard() {
     console.log('Initialized');
     const $body = $('body');
     const $header = $(document.createElement('h1'));
     $header.text('Othello');
+    const $scoreLeft = $(document.createElement('div'));
+    const $scoreRight = $(document.createElement('div'));
+    $scoreLeft.addClass('scoreLeft');
+    $scoreRight.addClass('scoreRight');
+    const $titleLeft = ($(document.createElement('h3')));
+    const $titleRight  = ($(document.createElement('h3')));
+    $titleLeft.addClass('left');
+    $titleRight.addClass('right');
+    $titleLeft.text('Black, to start');
+    $titleRight.text('White, go second');
+    $scoreLeft.append($titleLeft);
+    $scoreRight.append($titleRight);
+    $counterL.text('Score: '+whiteTaken);
+    $counterR.text('Score: '+blackTaken);
+    $scoreLeft.append($counterL);
+    $scoreRight.append($counterR);
     const $main = $(document.createElement('main'));
     for (var i=0; i<keys.length; i++) {
       boardModel[keys[i]] = [];
@@ -44,7 +64,7 @@ $(() => {
         $main.append($box);
       }
     }
-    $body.append($header, $main);
+    $body.append($header, $main, $scoreLeft, $scoreRight);
     $('.box').on('click', clickHandler);
     legal = false;
   }
@@ -58,30 +78,31 @@ $(() => {
       if (count === 0 || count % 2 === 0) {
         isLegal(e, row, col, 'W');
         if (legal === true) {
-        // isLegal(e, row, col, 'W');
           boardModel[row][col] = 'W';
           doFlip('B','W');
           $(e.target).removeClass('N');
           $(e.target).addClass('W clicked');
           legal = false;
+          $('.left').text('Black, Your turn');
+          $('.right').text('White team');
+          $counterR.text('Score: '+blackTaken);
         } else {
           count--;
         }
-        console.log(count);
       } else {
         isLegal(e, row, col, 'B');
         if (legal === true) {
-        // isLegal(e, row, col, 'B');
           boardModel[row][col] = 'B';
-
           doFlip('W','B');
           $(e.target).removeClass('N');
           $(e.target).addClass('B clicked');
           legal = false;
+          $('.right').text('White, Your turn');
+          $('.left').text('Black team');
+          $counterL.text('Score: '+whiteTaken);
         } else {
           count--;
         }
-        console.log(count);
       }
     } // hasClass 'clicked'
   } // end of clickHandler function
@@ -171,6 +192,8 @@ $(() => {
   function doFlip(enemy, player) {
     for (let i=0; i<chipsToFlip.length; i++) {
       if (!$(chipsToFlip[i]).hasClass('N')) {
+        if (player === 'B') whiteTaken++;
+        if (player === 'W') blackTaken++;
         $(chipsToFlip[i]).removeClass(enemy);
         $(chipsToFlip[i]).addClass(player);
       }

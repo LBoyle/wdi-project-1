@@ -22,3 +22,11 @@ main {
 .W {
   background-color: white;
 }
+.scoreLeft {
+  display: inline-block;
+  width: 200px;
+}
+.scoreRight {
+  display: inline-block;
+  width: 200px;
+}
