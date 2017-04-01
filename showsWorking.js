@@ -1,3 +1,5 @@
+// Don't expect this code to work, I'll just stuff loads in here for later
+
 $(() => {
   // N not assigned, B black, W white
   const keys = ['a','b','c','d','e','f','g','h'];
@@ -54,17 +56,17 @@ $(() => {
       count++;
       // console.log(`click count is ${count}`);
       if (count === 0 || count%2 === 0) {
-        if (isLegal(e, row, col, 'W')) {
-          //isLegal(e, row, col, 'W');
-          boardModel[row][col] = 'W';
-          $(e.target).addClass('W clicked');
-        }
+//        if (isLegal(e, row, col, 'W')) {
+        isLegal(e, row, col, 'W');
+        boardModel[row][col] = 'W';
+        $(e.target).addClass('W clicked');
+//        }
       } else {
-        if (isLegal(e, row, col, 'B')) {
-          //isLegal(e, row, col, 'B');
-          boardModel[row][col] = 'B';
-          $(e.target).addClass('B clicked');
-        }
+//        if (isLegal(e, row, col, 'B')) {
+        isLegal(e, row, col, 'B');
+        boardModel[row][col] = 'B';
+        $(e.target).addClass('B clicked');
+//        }
       }
       // captureFunction goes here inside isLegal conditional
     }
@@ -91,8 +93,8 @@ $(() => {
     console.log('prev col: '+prevColData);
     console.log('next col: '+nextColData);
     if ( // only one of these must return true for player to place
-      checkRowOrCol(e, row, col, current, prevRowData, nextRowData)||
-      checkRowOrCol(e, row, col, current, prevColData, nextColData)||
+      checkRow(e, row, col, current, prevRowData, nextRowData)||
+      checkRow(e, row, col, current, prevColData, nextColData)||
       checkDiag(e, row, col, current)
     ) {
       return true;
@@ -100,10 +102,13 @@ $(() => {
       return false;
     }
   }
-  // I've rigged this function to do horizontal or vertical checks based on input
-  function checkRowOrCol(e, row, col, current, prev, next) {
+  // so I couldn't really plan this checkRow function, first one I wrote
+  // I used the console to get small piece working at a time
+  function checkRow(e, row, col, current, prev, next) {
     let legal = false;
-    // I mean to get rid of the W or B conditional, but not bother just yet
+    // I was checking if the clicked square was at the edge, so as only to probe in one direction
+    // but I didn't need to do it. Live refactoring.
+    // I mean to get rid of the check for W or B, but not bother just yet
     if (current === 'W') {
       if (
           (next[0] === 'B' && next[1] === 'W') || (prev[0] === 'B' && prev[1] === 'W')
@@ -179,9 +184,106 @@ $(() => {
     } /*End of main conditional*/
     //}
     console.log(legal);
-    return legal;
+    //return legal;
   } // end of function
-
+  // function checkCol(e, row, col, current) {
+  //   //console.log(keys[keys.indexOf(row)-1]);
+  //   let legal = false;
+  //
+  //   const prev = (boardModel[keys[keys.indexOf(row)-1]] !== undefined) ? boardModel[keys[keys.indexOf(row)-1]][col] : undefined;
+  //   const prev2 = (boardModel[keys[keys.indexOf(row)-2]] !== undefined) ? boardModel[keys[keys.indexOf(row)-2]][col] : undefined;
+  //   const prev3 = (boardModel[keys[keys.indexOf(row)-3]] !== undefined) ? boardModel[keys[keys.indexOf(row)-3]][col] : undefined;
+  //   const prev4 = (boardModel[keys[keys.indexOf(row)-4]] !== undefined) ? boardModel[keys[keys.indexOf(row)-4]][col] : undefined;
+  //   const prev5 = (boardModel[keys[keys.indexOf(row)-5]] !== undefined) ? boardModel[keys[keys.indexOf(row)-5]][col] : undefined;
+  //   const prev6 = (boardModel[keys[keys.indexOf(row)-6]] !== undefined) ? boardModel[keys[keys.indexOf(row)-6]][col] : undefined;
+  //   const prev7 = (boardModel[keys[keys.indexOf(row)-7]] !== undefined) ? boardModel[keys[keys.indexOf(row)-7]][col] : undefined;
+  //   const next = (boardModel[keys[keys.indexOf(row)+1]] !== undefined) ? boardModel[keys[keys.indexOf(row)+1]][col] : undefined;
+  //   const next2 = (boardModel[keys[keys.indexOf(row)+2]] !== undefined) ? boardModel[keys[keys.indexOf(row)+2]][col] : undefined;
+  //   const next3 = (boardModel[keys[keys.indexOf(row)+3]] !== undefined) ? boardModel[keys[keys.indexOf(row)+3]][col] : undefined;
+  //   const next4 = (boardModel[keys[keys.indexOf(row)+4]] !== undefined) ? boardModel[keys[keys.indexOf(row)+4]][col] : undefined;
+  //   const next5 = (boardModel[keys[keys.indexOf(row)+5]] !== undefined) ? boardModel[keys[keys.indexOf(row)+5]][col] : undefined;
+  //   const next6 = (boardModel[keys[keys.indexOf(row)+6]] !== undefined) ? boardModel[keys[keys.indexOf(row)+6]][col] : undefined;
+  //   const next7 = (boardModel[keys[keys.indexOf(row)+7]] !== undefined) ? boardModel[keys[keys.indexOf(row)+7]][col] : undefined;
+  //   console.log('prev: '+prev, prev2, prev3, prev4+' next: '+next, next2, next3, next4);
+  //
+  //   // just pasting in the other conditionals
+  //   // to see if they work with no changes
+  //
+  //   if (current === 'W') {
+  //     if (
+  //         (next === 'B' && next2 === 'W') || (prev === 'B' && prev2 === 'W')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'B' && next2 === 'B' && next3 === 'W')||
+  //         (prev === 'B' && prev2 === 'B' && prev3 === 'W')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'B' && next2 === 'B' && next3 === 'B' && next4 === 'W')||
+  //         (prev === 'B' && prev2 === 'B' && prev3 === 'B' && prev4 === 'W')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'B' && next2 === 'B' && next3 === 'B' && next4 === 'B' && next5 === 'W')||
+  //         (prev === 'B' && prev2 === 'B' && prev3 === 'B' && prev4 === 'B' && prev5 === 'W')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'B' && next2 === 'B' && next3 === 'B' && next4 === 'B' && next5 === 'B' && next6 === 'W')||
+  //         (prev === 'B' && prev2 === 'B' && prev3 === 'B' && prev4 === 'B' && prev5 === 'B' && prev6 === 'W')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'B' && next2 === 'B' && next3 === 'B' && next4 === 'B' && next5 === 'B' && next6 === 'B' && next7 === 'W')||
+  //         (prev === 'B' && prev2 === 'B' && prev3 === 'B' && prev4 === 'B' && prev5 === 'B' && prev6 === 'B' && prev7 === 'W')
+  //       ) {
+  //       legal = true;
+  //     }
+  //   } else /* Middle of main conditional */ {
+  //     if (
+  //         (next === 'W' && next2 === 'B') || (prev === 'W' && prev2 === 'B')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'W' && next2 === 'W' && next3 === 'B')||
+  //         (prev === 'W' && prev2 === 'W' && prev3 === 'B')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'W' && next2 === 'W' && next3 === 'W' && next4 === 'B')||
+  //         (prev === 'W' && prev2 === 'W' && prev3 === 'W' && prev4 === 'B')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'W' && next2 === 'W' && next3 === 'W' && next4 === 'W' && next5 === 'B')||
+  //         (prev === 'W' && prev2 === 'W' && prev3 === 'W' && prev4 === 'W' && prev5 === 'B')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'W' && next2 === 'W' && next3 === 'W' && next4 === 'W' && next5 === 'W' && next6 === 'B')||
+  //         (prev === 'W' && prev2 === 'W' && prev3 === 'W' && prev4 === 'W' && prev5 === 'W' && prev6 === 'B')
+  //       ) {
+  //       legal = true;
+  //     }
+  //     if (
+  //         (next === 'W' && next2 === 'W' && next3 === 'W' && next4 === 'W' && next5 === 'W' && next6 === 'W' && next7 === 'B')||
+  //         (prev === 'W' && prev2 === 'W' && prev3 === 'W' && prev4 === 'W' && prev5 === 'W' && prev6 === 'W' && prev7 === 'B')
+  //       ) {
+  //       legal = true;
+  //     }
+  //   }
+  //   console.log('vertical: '+legal);
+  // } // end of check vertical function
   function checkDiag(e, row, col, current) {
 
   }
