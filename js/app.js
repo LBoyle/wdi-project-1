@@ -82,44 +82,98 @@ $(() => {
     let legal = false;
     const prev = boardModel[row][col-1];
     const prev2 = boardModel[row][col-2];
+    const prev3 = boardModel[row][col-3];
+    const prev4 = boardModel[row][col-4];
+    const prev5 = boardModel[row][col-5];
+    const prev6 = boardModel[row][col-6];
+    const prev7 = boardModel[row][col-7];
     const next = boardModel[row][col+1];
     const next2 = boardModel[row][col+2];
-    if (next === undefined) { // Right edge
-      if (current === 'W') {
-        if (prev === 'B' && prev2 === 'W') {
-          legal = true;
-        }
-      } else {
-        if (prev === 'W' && prev2 === 'B') {
-          legal = true;
-        }
+    const next3 = boardModel[row][col+3];
+    const next4 = boardModel[row][col+4];
+    const next5 = boardModel[row][col+5];
+    const next6 = boardModel[row][col+6];
+    const next7 = boardModel[row][col+7];
+    // I was checking if the clicked square was at the edge, so as only to probe in one direction
+    // but I didn't need to do it. Live refactoring.
+    // I mean to get rid of the check for W or B, but not bother just yet
+    if (current === 'W') {
+      if (
+        (next === 'B' || prev === 'B' && next2 === 'W' || prev2 === 'W')||(
+          (next === 'B' || prev === 'B')&&
+          (next2 === 'B' || prev2 === 'B')&&
+          (next3 === 'W' || prev3 === 'W')
+        )||(
+          (next === 'B' || prev === 'B')&&
+          (next2 === 'B' || prev2 === 'B')&&
+          (next3 === 'B' || prev3 === 'B')&&
+          (next4 === 'W' || prev4 === 'W')
+        )||(
+          (next === 'B' || prev === 'B')&&
+          (next2 === 'B' || prev2 === 'B')&&
+          (next3 === 'B' || prev3 === 'B')&&
+          (next4 === 'B' || prev4 === 'B')&&
+          (next5 === 'W' || prev5 === 'W')
+        )||(
+          (next === 'B' || prev === 'B')&&
+          (next2 === 'B' || prev2 === 'B')&&
+          (next3 === 'B' || prev3 === 'B')&&
+          (next4 === 'B' || prev4 === 'B')&&
+          (next5 === 'B' || prev5 === 'B')&&
+          (next6 === 'W' || prev6 === 'W')
+        )||(
+          (next === 'B' || prev === 'B')&&
+          (next2 === 'B' || prev2 === 'B')&&
+          (next3 === 'B' || prev3 === 'B')&&
+          (next4 === 'B' || prev4 === 'B')&&
+          (next5 === 'B' || prev5 === 'B')&&
+          (next6 === 'B' || prev6 === 'B')&&
+          (next7 === 'W' || prev7 === 'W')
+        )
+      ) {
+        legal = true;
       }
-    } else if(prev === undefined) { // Left edge
-      if (current === 'W') {
-        if (next === 'B' && next2 === 'W') {
-          legal = true;
-        }
-      } else {
-        if (next === 'W' && next2 === 'B') {
-          legal = true;
-        }
-      }
-    } else { // Not the edge
-      console.log(prev2, prev, current, next, next2);
-      console.log('not the edge');
-      if (current === 'W') {
-        if ((next === 'B' || prev === 'B')&&(next2 === 'W' || prev2 === 'W')) {
-          legal = true;
-        }
-      } else {
-        if ((next === 'W' || prev === 'W')&&(next2 === 'B' || prev2 === 'B')) {
-          legal = true;
-        }
+    } else {
+      if (
+        (next === 'W' || prev === 'W' && next2 === 'B' || prev2 === 'B')||(
+          (next === 'W' || prev === 'W')&&
+          (next2 === 'W' || prev2 === 'W')&&
+          (next3 === 'B' || prev3 === 'B')
+        )||(
+          (next === 'W' || prev === 'W')&&
+          (next2 === 'W' || prev2 === 'W')&&
+          (next3 === 'W' || prev3 === 'W')&&
+          (next4 === 'B' || prev4 === 'B')
+        )||(
+          (next === 'W' || prev === 'W')&&
+          (next2 === 'W' || prev2 === 'W')&&
+          (next3 === 'W' || prev3 === 'W')&&
+          (next4 === 'W' || prev4 === 'W')&&
+          (next5 === 'B' || prev5 === 'B')
+        )||(
+          (next === 'W' || prev === 'W')&&
+          (next2 === 'W' || prev2 === 'W')&&
+          (next3 === 'W' || prev3 === 'W')&&
+          (next4 === 'W' || prev4 === 'W')&&
+          (next5 === 'W' || prev5 === 'W')&&
+          (next6 === 'B' || prev6 === 'B')
+        )||(
+          (next === 'W' || prev === 'W')&&
+          (next2 === 'W' || prev2 === 'W')&&
+          (next3 === 'W' || prev3 === 'W')&&
+          (next4 === 'W' || prev4 === 'W')&&
+          (next5 === 'W' || prev5 === 'W')&&
+          (next6 === 'W' || prev6 === 'W')&&
+          (next7 === 'B' || prev7 === 'B')
+        )
+      ) {
+        legal = true;
       }
     }
+    //}
     console.log(legal);
     // return legal;
-  }
+  } // end of function
   function checkCol(e, row, col, current) {
 
   }
