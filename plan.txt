@@ -24,7 +24,9 @@ event listeners,
 reset button can just refresh the page to avoid the problems I had with tictactoe
 lol
 
-\\\\\\\\\\ above is the plan at Second commit
+\\\\\\\\\\ above is an actual plan at Second commit
+
+From here this is more like a build log.
 
 ////////// I had my mvp by the time I wrote this part, below, written on Sunday morning
 
@@ -74,4 +76,32 @@ I'm thinking of adding a setTimeout before the computer makes its move, so as no
 
 I think I can just use pretty much the same logic as isLegal and whatnot to check how many takeable squares for every possible click, choose the one with the highest, then call othello.doFlip with it's choice and player and enemy values. Or something.
 
-I'm sure the idea will change when I attempt to write it, but development has always been like that for me. 
+I'm sure the idea will change when I attempt to write it, but development has always been like that for me.
+
+\\\\\\\\\\\\\\\\
+
+//////////////// Now Sunday night, after writing the computer.
+
+Unpredictably, there was only one unpredicted problem, it was trying to use undefined as a key again. This time when looping through the abacus object.
+
+It went well, quite a while spend renaming functions just to be extra sure, I made new functions inside the parent computerPlay function, just to cut them off from the base game. And I may have changed some things anyway.
+
+I mean to make the game and computer player separate objects in the longer run. Which is why I copied the functions instead of just calling them from elsewhere. I want the player to choose between PvP, PvC or CvC, which would be cool.
+The recursion depth might be pretty high, maybe we could use it as a laptop benchmark ha. The computer player is made possible by running the large isLegal function 64 times, it's full of loops with function calls.
+
+So it does all the same things as the base game to figure out which moves are legal and hoe many pieces it could take for each individual square, finds the legal move or moves that scores the most, then returns the ID of that square.
+If it gets more than one high scoring square it just takes the first one, meaning it tends towards the top left corner.
+Modifying the inputs for the filtering could change the strategy the computer uses, in some simple way.
+
+It's still bound to the click event, but I think I have a way around it which I'll try to implement tomorrow.
+
+I'm quite proud of this computer player, it's actually hard to beat, the best strategy is to try and predict it, it will always go for the biggest take and tend toward the top-right, it only looks at the board at the time of clicking.
+
+Actually I have an idea about how to implement predicting a few moves ahead, for all potential moves returned by the computer player as it is now, apply the move to a local boardModel then do the same for the enemy. I can see it either splitting at every possible move, every high-scoring move, or not at all, only like the first few potentialities.
+
+I'm gonna aim to mod this computer to project ahead a few moves and take advantage of the projections to improve its game.
+
+Also, still no win condition or end to the game, it just softlocks when neither player can move and you have to refresh.
+This violates the rules of Othello, if one player can't move but the other can, they should be able to make those moves, and there's no way to skip a go yet. 
+
+\\\\\\\\\\\\\\\ Sunday night
