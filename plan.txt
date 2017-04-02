@@ -78,9 +78,9 @@ I think I can just use pretty much the same logic as isLegal and whatnot to chec
 
 I'm sure the idea will change when I attempt to write it, but development has always been like that for me.
 
-\\\\\\\\\\\\\\\\
+\\\\\\\\\\\\\\\\ Sunday morning
 
-//////////////// Now Sunday night, after writing the computer.
+//////////////// Now Sunday night, after writing the computer player.
 
 Unpredictably, there was only one unpredicted problem, it was trying to use undefined as a key again. This time when looping through the abacus object.
 
@@ -100,8 +100,9 @@ I'm quite proud of this computer player, it's actually hard to beat, the best st
 Actually I have an idea about how to implement predicting a few moves ahead, for all potential moves returned by the computer player as it is now, apply the move to a local boardModel then do the same for the enemy. I can see it either splitting at every possible move, every high-scoring move, or not at all, only like the first few potentialities.
 
 I'm gonna aim to mod this computer to project ahead a few moves and take advantage of the projections to improve its game.
+It makes use of undefined variables and ints, no floats I think, doesn't attempt to look where it can't, I think it might not use that much hardware. Besides my macbook has a totally OP cpu. 
 
 Also, still no win condition or end to the game, it just softlocks when neither player can move and you have to refresh.
-This violates the rules of Othello, if one player can't move but the other can, they should be able to make those moves, and there's no way to skip a go yet. 
+This violates the rules of Othello, if one player can't move but the other can, they should be able to make those moves, and there's no way to skip a go yet.
 
 \\\\\\\\\\\\\\\ Sunday night
