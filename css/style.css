@@ -14,7 +14,7 @@ main {
   border-radius: 10px;
 }
 .box {
-  margin: 0 0 -4px 0;
+  /*margin: 0 0 -4px 0;*/
   height: 50px;
   width: 50px;
   border: 1px solid black;
