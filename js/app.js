@@ -47,7 +47,9 @@ $(() => {
     console.log('Initialized');
     const $body = $('body');
     const $header = $(document.createElement('h1'));
+    const $instr = $(document.createElement('p'));
     $header.text('Othello');
+    $instr.text('computer makes it\'s choice when you click for it');
     const $scoreLeft = $(document.createElement('div'));
     const $scoreRight = $(document.createElement('div'));
     $scoreLeft.addClass('scoreLeft');
@@ -85,7 +87,7 @@ $(() => {
         $main.append($box);
       }
     }
-    $body.append($header, $main, $scoreLeft, $scoreRight);
+    $body.append($header, $instr, $main, $scoreLeft, $scoreRight);
     $('.box').on('click', clickHandler);
     legal = false;
   }
@@ -336,14 +338,19 @@ $(() => {
         }
       }
       let counter = 0;
+      console.log(abacus);
       const beanKeys = Object.keys(abacus);
       for (let i=0; i<beanKeys.length; i++) {
         if (abacus[beanKeys[i]] > counter) {
-          counter = abacus[beanKeys[i]];
+          if ($(beanKeys[i]).hasClass('N')) {
+            counter = abacus[beanKeys[i]];
+            console.log(abacus[beanKeys[i]]);
+          }
         }
       }
       for (let i=0; i<beanKeys.length; i++) {
         if (abacus[beanKeys[i]] === counter) {
+          console.log(beanKeys[i]);
           if ($(beanKeys[i]).hasClass('N')) {
             possibleSquares.push(beanKeys[i]);
           }
