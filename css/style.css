@@ -5,6 +5,10 @@ body {
   text-align: center;
   font-family: sans-serif;
 }
+p {
+  color: white;
+  text-shadow: 2px 2px black;
+}
 main {
   width: 416px;
   height: 416px;
