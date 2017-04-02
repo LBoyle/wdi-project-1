@@ -4,7 +4,7 @@ My first project for WDI London at GA
 I got my info about the game of Othello here:
 http://radagast.se/othello/Help/strategy.html
 
-Check out the game here:
+Check it out here:
 https://infinite-meadow-13142.herokuapp.com/
 
 So as of right now, it's still MVP, it's in PvC mode, Player has the black pieces, Computer has white. 
