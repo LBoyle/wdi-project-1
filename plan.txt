@@ -23,4 +23,55 @@ event listeners,
 
 reset button can just refresh the page to avoid the problems I had with tictactoe
 lol
-^^^^^^^^^^^^ this is the plan at Second commit
+
+\\\\\\\\\\ above is the plan at Second commit
+
+////////// I had my mvp by the time I wrote this part, below, written on Sunday morning
+
+Note, I did no googling.
+I was unsure how to approach checking if a move is legal, and worked out how one step at a time, lots of trial and error with in the console.
+
+So I went for the boardModel object, there's a model at the top of my JS file, because I decided to assign it all inside the loop that creates the board.
+I had the click detection, class changes, boardModel, basic css done on the Friday.
+I spent Saturday making the isLegal function and the other functions it calls.
+
+I tried returning true or false as just a check before checking again to add chipsToFlip, but that's repeating myself.
+I changed isLegal to add any takeable squares to chipsToFlip and change the global legal var to true upon checking, if it finds none, legal stays false and no squares are added to chipsToFlip. None of the functions return anything.
+
+The count would still increment upon an illegal click and would skip a turn, so I added else {count--} to deincrement and not skip turns.
+
+Next came the checkBoard function. I had planned to make four functions to check horizontal, vertical, diagonal one way, and diagonal the other way, but I worked out a way to run all directions through the same one function, I'm very proud of this.
+You can see in isLegal, I make pairs of lists to feed into the checkBoard function, I had to use conditionals to make sure I don't attempt to read dict[undefined][foo] which return an error and breaks the game.
+
+I realised at this point that I rely quite heavily on JS's garbage collection.
+
+In checkBoard, I used explicit conditionals with no else clause to check all directions from a given clicked square, this doesn't produce duplicates in chipsToFlip, because each direction is checked only once.
+
+I then made the pushChips function to avoid repeating myself. There is a good example in showsWorking.js, showing how I was pushing chips before, see the comment at the bottom of checkBoard.
+
+Here you can see I'm passing a lot of variables around in my function calls.
+pushChips finds all squares in a given direction that match the enemy's class, using ID's for specificity. Then it pushes the correct squares ID's to chipsToFlip working them out using different maths for each direction, which is why I'm still repeating myself here.
+But it's much less code than before.
+
+At this point I began to forget how some parts worked, like updating the boardModel, so I just didn't touch any of it and relied on it to work.
+I have to read through it all again to remember how it works.
+
+Last I made the doFlip function, which is passed the current player and enemy class values, 'B' or 'W', and just flips every square which has it's ID stored in chipsToFlip, then empties chipsToFlip.
+
+All of this happens, or is called, at the top of the clickHandler, then after it happens, the clicked square is also flipped, the DOM is updated and the game awaits another click.
+
+So that's what I have so far.
+
+I'm now preparing to alternate between player turns, and computer.
+
+\\\\\\\\\\\\\\ above was written on Sunday morning
+
+////////////// Plan for the computer, also written Sunday morning, no code written yet.
+
+So I have a clear idea of how I'll make a computer for this game, I could integrate it into the game as is, but I want to separate it into a different object instead, if I can. Then the player can choose pvp, pvc, or hopefully cvc, which would be cool.
+
+I'm thinking of adding a setTimeout before the computer makes its move, so as not to patronise great Othello players.
+
+I think I can just use pretty much the same logic as isLegal and whatnot to check how many takeable squares for every possible click, choose the one with the highest, then call othello.doFlip with it's choice and player and enemy values. Or something.
+
+I'm sure the idea will change when I attempt to write it, but development has always been like that for me. 

@@ -26,6 +26,23 @@ $(() => {
   //   //     0   1   2   3   4   5   6   7
   // };
 
+  // I will use this init function to choose game mode
+
+  // function init(confirm) {
+  //   console.log('Initialized');
+  //   //const confirm = confirm('Yes for 2 player, no to play computer');
+  //   if (confirm === true) {
+  //     console.log(confirm);
+  //     createBoard();
+  //   } else {
+  //     console.log(confirm);
+  //     createBoard();
+  //   }
+  // }
+
+  // createBoard just makes and appends all the DOM elements, it looks complicated, but it's not
+  // it only runs once, once the click event is setup, we don't need to change anything, the clickHandler calls the other functions. 
+
   function createBoard() {
     console.log('Initialized');
     const $body = $('body');
@@ -111,6 +128,8 @@ $(() => {
           $counterL.text('Tiles: '+blackTiles+' Taken: '+whiteTaken);
           $counterR.text('Tiles: '+whiteTiles+' Taken: '+blackTaken);
         } else {
+          // if legal is false, nothing has been pushed to chipsToFlip
+          // so just deincrement turn counter
           count--;
         }
       }
@@ -144,9 +163,9 @@ $(() => {
       blTotrPrevData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
       blTotrNextData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
     }
-    // if (
-      // only one of these must return true for player to place
-      // I can now use the same one function to check all directions
+    // changed to push all legal blocks to chipsToFilp to be flipped
+    // this function returns nothing
+    // I can now use the same one function to check all directions
     checkBoard(e, row, col, current, prevRowData, nextRowData, 'h');
     checkBoard(e, row, col, current, prevColData, nextColData, 'v');
     checkBoard(e, row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
@@ -283,10 +302,8 @@ $(() => {
       legal = true;
       pushChips(plane, 6, 'neg', row, col, player);
     }
-    // I figure I'll change the colors in this function
-    // rather than make a whole new function, the data is already here to work with
-    // return legal;
   } // end of function
 
   createBoard();
+  // init(confirm('Yes for 2 player, no to play computer'));
 });

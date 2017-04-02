@@ -1,7 +1,7 @@
 body {
   background-image: url("http://static.tumblr.com/5964c3521b78dc6bde5abc3305b18f9a/7h0sds4/bMxmtka8w/tumblr_static_tabletop1.9.7.13.jpg");
   background-color: #B8860B;
-
+  text-shadow: 1px 1px grey;
   text-align: center;
   font-family: sans-serif;
 }
