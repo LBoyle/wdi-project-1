@@ -1,6 +1,7 @@
 # wdi-project-1
 My first project for WDI London at GA
 
+# Othello
 I got my info about the game of Othello here:
 http://radagast.se/othello/Help/strategy.html
 
