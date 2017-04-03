@@ -2,7 +2,7 @@
 
 
 
-
+var CP = CP;
 
 $(() => {
   // N not assigned, B black, W white
@@ -53,7 +53,15 @@ $(() => {
     const $header = $(document.createElement('h1'));
     const $instr = $(document.createElement('p'));
     $header.text('Othello');
-    $instr.text('computer makes it\'s choice when you click for it');
+    if (gameMode === 'pvp') {
+      $instr.text('Player vs Player');
+    }
+    if (gameMode === 'pvc') {
+      $instr.text('Player vs Computer');
+    }
+    if (gameMode === 'cvc') {
+      $instr.text('Computer vs it\'s self');
+    }
     const $scoreLeft = $(document.createElement('div'));
     const $scoreRight = $(document.createElement('div'));
     $scoreLeft.addClass('scoreLeft');
@@ -93,14 +101,12 @@ $(() => {
     }
     $body.append($header, $instr, $main, $scoreLeft, $scoreRight);
     if (gameMode === 'pvp') {
-      // $('.box').on('click', PvP.bind(this));
+      // $('.box').on('click', PvPController.bind(this));
       PvPController();
-    }
-    if (gameMode === 'pvc') {
+    } else if (gameMode === 'pvc') {
       // $('.box').on('click', PvC.bind(this));
       PvCTimer();
-    }
-    if (gameMode === 'cvc') {
+    } else if (gameMode === 'cvc') {
       CvCTimer();
     }
     legal = false;
@@ -139,16 +145,16 @@ $(() => {
 
   function PvPController() { // not a timer
     if (count === 0 || count % 2 === 0) {
-      $('.box').on('click', function(e) {
+      $('.box').on('click', (e) => {
         PvC(e, 'B', 'W');
         $('.box').off();
-        PvCTimer();
+        PvPController();
       });
     } else {
-      $('.box').on('click', function(e) {
+      $('.box').on('click', (e) => {
         PvC(e, 'W', 'B');
         $('.box').off();
-        PvCTimer();
+        PvPController();
       });
     }
   }
@@ -159,7 +165,6 @@ $(() => {
     count++;
     // if (count < 64) {
     const cpResponse = CP.computerPlay(player, boardModel, keys);
-    console.log(cpResponse);
     const row = cpResponse.split('')[1];
     const col = parseInt(cpResponse.split('')[2]);
     isLegal(row, col, player);
@@ -181,20 +186,19 @@ $(() => {
 
   // PvC, computer is still bound to click handler
 
-  function PvC(e) {
-    console.log('PvC');
+  function PvC(e, player, enemy) {
     if (!$(e.target).hasClass('clicked')) {
-      let row = e.target.id.split('')[0];
-      let col = parseInt(e.target.id.split('')[1]);
+      const row = e.target.id.split('')[0];
+      const col = parseInt(e.target.id.split('')[1]);
       count++;
-      isLegal(row, col, 'B');
+      isLegal(row, col, player);
       if (legal === true) {
-        boardModel[row][col] = 'B';
-        doFlip('W','B', chipsToFlip);
+        boardModel[row][col] = player;
+        doFlip(enemy, player, chipsToFlip);
         blackTiles = numTiles('B');
         whiteTiles = numTiles('W');
-        $('#'+row+col).removeClass('N');
-        $('#'+row+col).addClass('B clicked');
+        $(e.target).removeClass('N');
+        $(e.target).addClass(player+' clicked');
         legal = false;
         $('.right').text('White, Your turn');
         $('.left').text('Black team');
@@ -272,7 +276,7 @@ $(() => {
         // boardModel[row][col-(i+1)] = player;
       });
     });
-  }
+  } // end of isLegal function
 
   function numTiles(player) {
     let num = 0;

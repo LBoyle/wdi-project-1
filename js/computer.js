@@ -1,3 +1,7 @@
+
+//// this much longer code doesn't make errors,
+// the refactored game logic in the other file makes mistakes
+
 var CP = CP || {
   computerPlay(player, boardModel, keys) {
     // console.log(this);
