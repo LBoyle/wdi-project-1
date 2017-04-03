@@ -1,201 +1,9 @@
-var CP = CP || {
-  computerPlay(player, boardModel, keys) {
-    // console.log(this);
-    // console.log(this);
-    // copy vars from parent
-    this.board = boardModel;
-    this.keysC = keys;
-    this.legal = false;
-    // create new vars
-    this.abacus = {};
-    this.chipsThisTurn = []; // reassigned every loop
-    this.possibleSquares = []; // one added to every loop, if it can score
-    this.chosenSquare = ''; // take the first from possible squares
-
-    this.getChoice(player);
-    return this.chosenSquare;
-
-  }, // end of computerPlay function
-
-  getChoice(player) {
-    // this function is pretty procedural, but it works.
-    for (let i=0; i<this.keysC.length; i++) {
-      for (let j=0; j<8; j++) {
-        const thisId = '#'+this.keysC[i]+(j).toString();
-        this.isLegalC(this.keysC[i], j, player);
-        const takeable = this.chipsThisTurn.length;
-        this.abacus[thisId] = takeable;
-        for (let i=this.chipsThisTurn.length; i>=0; i--) {
-          this.chipsThisTurn.pop([i]);
-        }
-      }
-    }
-    let counter = 0;
-    // console.log(this.abacus);
-    const beanKeys = Object.keys(this.abacus);
-    for (let i=0; i<beanKeys.length; i++) {
-      if (this.abacus[beanKeys[i]] > counter) {
-        if ($(beanKeys[i]).hasClass('N')) {
-          counter = this.abacus[beanKeys[i]];
-          // console.log(this.abacus[beanKeys[i]]);
-        }
-      }
-    }
-    for (let i=0; i<beanKeys.length; i++) {
-      if (this.abacus[beanKeys[i]] === counter) {
-        // console.log(beanKeys[i]);
-        if ($(beanKeys[i]).hasClass('N')) {
-          this.possibleSquares.push(beanKeys[i]);
-        }
-      }
-    }
-    this.chosenSquare = this.possibleSquares[0];
-    // console.log(this.possibleSquares);
-    // console.log(this.chosenSquare);
-  }, // end of getChoice function
-
-  ///////////////// function returns chosenSquare at the end
-
-  isLegalC(row, col, current) {
-    const prevRowData = [];
-    const nextRowData = [];
-    const prevColData = [];
-    const nextColData = [];
-    const tlTobrPrevData = [];
-    const tlTobrNextData = [];
-    const blTotrPrevData = [];
-    const blTotrNextData = [];
-    // 7 because I don't add the square you just clicked
-    for (let i=0; i<7; i++) {
-      // for the Row, trying to read from a Dict with
-      // dict[foo][outside range or undefined] returns undefined
-      prevRowData.push(this.board[row][col-(i+1)]);
-      nextRowData.push(this.board[row][col+(i+1)]);
-      // for Cols though, trying to read from a dict with
-      // dict[undefined][number or undefined]
-      // produces an error so I had to check each one individually
-      prevColData.push((this.board[this.keysC[this.keysC.indexOf(row)-(i+1)]] !== undefined) ? this.board[this.keysC[this.keysC.indexOf(row)-(i+1)]][col] : undefined);
-      nextColData.push((this.board[this.keysC[this.keysC.indexOf(row)+(i+1)]] !== undefined) ? this.board[this.keysC[this.keysC.indexOf(row)+(i+1)]][col] : undefined);
-      // this gets confusing
-      // can you believe it works though!?
-      tlTobrPrevData.push((this.board[this.keysC[this.keysC.indexOf(row)-(i+1)]] !== undefined) ? this.board[this.keysC[this.keysC.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
-      tlTobrNextData.push((this.board[this.keysC[this.keysC.indexOf(row)+(i+1)]] !== undefined) ? this.board[this.keysC[this.keysC.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
-      blTotrPrevData.push((this.board[this.keysC[this.keysC.indexOf(row)+(i+1)]] !== undefined) ? this.board[this.keysC[this.keysC.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
-      blTotrNextData.push((this.board[this.keysC[this.keysC.indexOf(row)-(i+1)]] !== undefined) ? this.board[this.keysC[this.keysC.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
-    }
-    // changed to push all legal blocks to chipsToFilp to be flipped
-    // this function returns nothing
-    // I can now use the same one function to check all directions
-    this.checkBoardC(row, col, current, prevRowData, nextRowData, 'h');
-    this.checkBoardC(row, col, current, prevColData, nextColData, 'v');
-    this.checkBoardC(row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
-    this.checkBoardC(row, col, current, blTotrPrevData, blTotrNextData, 'd2');
-  },
-
-  // I've rigged this function to do horizontal, vertical or diagonal checks based on input
-  // checkBoardC(e, row, col, current, blTotrPrevData, blTotrNextData, 'd2');
-  checkBoardC(row, col, player, prev, next, plane) {
-    let enemy = '';
-    if (player === 'B') {
-      enemy = 'W';
-    }else {
-      enemy = 'B';
-    }
-    if (next[0] === enemy && next[1] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 1, 'pos', row, col);
-    }
-    if (prev[0] === enemy && prev[1] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 1, 'neg', row, col);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 2, 'pos', row, col);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 2, 'neg', row, col);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 3, 'pos', row, col);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 3, 'neg', row, col);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 4, 'pos', row, col);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 4, 'neg', row, col);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 5, 'pos', row, col);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 5, 'neg', row, col);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === enemy && next[6] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 6, 'pos', row, col);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === enemy && prev[6] === player) {
-      this.legal = true;
-      this.pushChipsC(plane, 6, 'neg', row, col);
-    }
-  }, // end of checkBoard function
-
-  // pushChipsC(plane, 1, 'pos', row, col);
-  pushChipsC(plane, num, dir, row, col) {
-    // num is number of blocks to be taken
-    for (let i=0; i<num; i++) {
-      if (plane === 'h') {
-        if (dir === 'neg') {
-          this.chipsThisTurn.push('#'+row+(col-(i+1)).toString());
-        }
-        if (dir === 'pos') {
-          this.chipsThisTurn.push('#'+row+(col+(i+1)).toString());
-        }
-      }
-      if (plane === 'v') {
-        if (dir === 'neg') {
-          this.chipsThisTurn.push('#'+(this.keysC[this.keysC.indexOf(row)-(i+1)])+(col).toString());
-        }
-        if (dir === 'pos') {
-          this.chipsThisTurn.push('#'+(this.keysC[this.keysC.indexOf(row)+(i+1)])+(col).toString());
-        }
-      }
-      if (plane === 'd1') {
-        if (dir === 'neg') {
-          this.chipsThisTurn.push('#'+(this.keysC[this.keysC.indexOf(row)-(i+1)])+(col-(i+1)).toString());
-        }
-        if (dir === 'pos') {
-          this.chipsThisTurn.push('#'+(this.keysC[this.keysC.indexOf(row)+(i+1)])+(col+(i+1)).toString());
-        }
-      }
-      if (plane === 'd2') {
-        if (dir === 'neg') {
-          this.chipsThisTurn.push('#'+(this.keysC[this.keysC.indexOf(row)+(i+1)])+(col-(i+1)).toString());
-        }
-        if (dir === 'pos') {
-          this.chipsThisTurn.push('#'+(this.keysC[this.keysC.indexOf(row)-(i+1)])+(col+(i+1)).toString());
-        }
-      }
-    } // end of loop
-  } // end of pushChips function
-
-};
-/////////////////////// end of computerPlay Object
 
 
-//////////////////////// new location for computerPlay function
-// var othello = othello || {};
+
+
+
+
 $(() => {
   // N not assigned, B black, W white
   const keys = ['a','b','c','d','e','f','g','h'];
@@ -243,7 +51,7 @@ $(() => {
 
   function createBoard() {
     console.log('Initialized');
-    gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
+    // gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
     const $body = $('body');
     const $header = $(document.createElement('h1'));
     const $instr = $(document.createElement('p'));
@@ -287,16 +95,16 @@ $(() => {
       }
     }
     $body.append($header, $instr, $main, $scoreLeft, $scoreRight);
-    if (gameMode === 'pvp') {
-      $('.box').on('click', PvP.bind(this));
-    }
-    if (gameMode === 'pvc') {
-      // $('.box').on('click', PvC.bind(this));
-      PvCTimer();
-    }
-    if (gameMode === 'cvc') {
-      CvCTimer();
-    }
+    // if (gameMode === 'pvp') {
+    $('.box').on('click', PvP.bind(this));
+    // }
+    // if (gameMode === 'pvc') {
+    //   // $('.box').on('click', PvC.bind(this));
+    //   PvCTimer();
+    // }
+    // if (gameMode === 'cvc') {
+    //   CvCTimer();
+    // }
     legal = false;
   }
 
@@ -331,21 +139,21 @@ $(() => {
     }
   }
 
-  function PvPController() { // not a timer
-    if (count === 0 || count % 2 === 0) {
-      $('.box').on('click', function(e) {
-        PvC(e, 'B', 'W');
-        $('.box').off();
-        PvCTimer();
-      });
-    } else {
-      $('.box').on('click', function(e) {
-        PvC(e, 'W', 'B');
-        $('.box').off();
-        PvCTimer();
-      });
-    }
-  }
+  // function PvPController() { // not a timer
+  //   if (count === 0 || count % 2 === 0) {
+  //     $('.box').on('click', function(e) {
+  //       PvC(e, 'B', 'W');
+  //       $('.box').off();
+  //       PvCTimer();
+  //     });
+  //   } else {
+  //     $('.box').on('click', function(e) {
+  //       PvC(e, 'W', 'B');
+  //       $('.box').off();
+  //       PvCTimer();
+  //     });
+  //   }
+  // }
 
   // CvC
 
@@ -474,87 +282,154 @@ $(() => {
     } // hasClass 'clicked'
   } // end of PvP function
 
+// Here is the new much shorter isLegal function
+// it does the same thing that my three long ass functions did
+
+  // row= The letter of your board model
+  // col= Numerical column of board model
+  // current= Which player ('W'/'B') clicked
   function isLegal(row, col, current) {
-    const prevRowData = [];
-    const nextRowData = [];
-    const prevColData = [];
-    const nextColData = [];
-    const tlTobrPrevData = [];
-    const tlTobrNextData = [];
-    const blTotrPrevData = [];
-    const blTotrNextData = [];
-    // 7 because I don't add the square you just clicked
-    for (let i=0; i<7; i++) {
-      // for the Row, trying to read from a Dict with
-      // dict[foo][outside range or undefined] returns undefined
-      prevRowData.push(boardModel[row][col-(i+1)]);
-      nextRowData.push(boardModel[row][col+(i+1)]);
-      // for Cols though, trying to read from a dict with
-      // dict[undefined][number or undefined]
-      // produces an error so I had to check each one individually
-      prevColData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col] : undefined);
-      nextColData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col] : undefined);
-      // this gets confusing
-      // can you believe it works though!?
-      tlTobrPrevData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
-      tlTobrNextData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
-      blTotrPrevData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
-      blTotrNextData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
-    }
-    // changed to push all legal blocks to chipsToFilp to be flipped
-    // this function returns nothing
-    // I can now use the same one function to check all directions
-    checkBoard(row, col, current, prevRowData, nextRowData, 'h');
-    checkBoard(row, col, current, prevColData, nextColData, 'v');
-    checkBoard(row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
-    checkBoard(row, col, current, blTotrPrevData, blTotrNextData, 'd2');
+    // Find possible planes
+    // In terms of [row, col]
+    const directions = [
+      [-1,0], // N
+      [-1,1], // NE
+      [0,1], // E
+      [1,1], // SE
+      [1,0], // S
+      [1,-1], // SW
+      [0,-1], // W
+      [-1,-1] // NW
+    ];
+
+    const options = directions.map(direction => {
+      const rowChange = direction[0];
+      const colChange = direction[1];
+      let plane  = [];
+      let newRow = row;
+      let newCol = col;
+
+      for (let j = 0; j < 7; j++) {
+        // Currently keys are an array of letters
+        // So we need to find the rows' index
+        const rowIndex  = keys.indexOf(newRow);
+        // Find the new row & column
+        newRow          = keys[rowIndex + rowChange];
+        newCol          = newCol + colChange;
+        // Optimisation here... instead of continue?
+        if (!newRow || newCol > 7 || newCol < 0) continue;
+        // Find the value of the next square
+        const nextSquare = boardModel[newRow][newCol];
+        // Display options using border
+        // $(`#${newRow}${newCol}`).css('border-color', 'red');
+        // setTimeout(() => {
+        //   $(`#${newRow}${newCol}`).css('border-color', 'black');
+        // }, 500);
+
+        if (nextSquare === 'N') {
+          plane = [];
+          break;
+        } else if (nextSquare === current) {
+          break;
+        }
+
+        plane.push(`#${newRow}${newCol}`);
+      }
+      if (plane.toString()) return plane;
+    }).filter(Boolean);
+
+    // Could remove this legal flag?
+    if (options.toString()) legal = true;
+
+    options.forEach(pane => {
+      pane.forEach(id => {
+        chipsToFlip.push(id);
+        // boardModel[row][col-(i+1)] = player;
+      });
+    });
   }
 
-  function pushChips(plane, num, dir, row, col, player) {
-    // num is number of blocks to be taken
-    for (let i=0; i<num; i++) {
-      if (plane === 'h') {
-        if (dir === 'neg') {
-          chipsToFlip.push('#'+row+(col-(i+1)).toString());
-          boardModel[row][col-(i+1)] = player;
-        }
-        if (dir === 'pos') {
-          chipsToFlip.push('#'+row+(col+(i+1)).toString());
-          boardModel[row][col+(i+1)] = player;
-        }
-      }
-      if (plane === 'v') {
-        if (dir === 'neg') {
-          chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col).toString());
-          boardModel[keys[keys.indexOf(row)-(i+1)]][col] = player;
-        }
-        if (dir === 'pos') {
-          chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col).toString());
-          boardModel[keys[keys.indexOf(row)+(i+1)]][col] = player;
-        }
-      }
-      if (plane === 'd1') {
-        if (dir === 'neg') {
-          chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col-(i+1)).toString());
-          boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] = player;
-        }
-        if (dir === 'pos') {
-          chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col+(i+1)).toString());
-          boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] = player;
-        }
-      }
-      if (plane === 'd2') {
-        if (dir === 'neg') {
-          chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col-(i+1)).toString());
-          boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] = player;
-        }
-        if (dir === 'pos') {
-          chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col+(i+1)).toString());
-          boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] = player;
-        }
-      }
-    } // end of loop
-  } // end of pushChips function
+  // function isLegal2(row, col, current) {
+  //   const prevRowData = [];
+  //   const nextRowData = [];
+  //   const prevColData = [];
+  //   const nextColData = [];
+  //   const tlTobrPrevData = [];
+  //   const tlTobrNextData = [];
+  //   const blTotrPrevData = [];
+  //   const blTotrNextData = [];
+  //   // 7 because I don't add the square you just clicked
+  //   for (let i=0; i<7; i++) {
+  //     // for the Row, trying to read from a Dict with
+  //     // dict[foo][outside range or undefined] returns undefined
+  //     prevRowData.push(boardModel[row][col-(i+1)]);
+  //     nextRowData.push(boardModel[row][col+(i+1)]);
+  //     // for Cols though, trying to read from a dict with
+  //     // dict[undefined][number or undefined]
+  //     // produces an error so I had to check each one individually
+  //     prevColData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col] : undefined);
+  //     nextColData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col] : undefined);
+  //     // this gets confusing
+  //     // can you believe it works though!?
+  //     tlTobrPrevData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
+  //     tlTobrNextData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
+  //     blTotrPrevData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
+  //     blTotrNextData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
+  //   }
+  //   // changed to push all legal blocks to chipsToFilp to be flipped
+  //   // this function returns nothing
+  //   // I can now use the same one function to check all directions
+  //   checkBoard(row, col, current, prevRowData, nextRowData, 'h');
+  //   checkBoard(row, col, current, prevColData, nextColData, 'v');
+  //   checkBoard(row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
+  //   checkBoard(row, col, current, blTotrPrevData, blTotrNextData, 'd2');
+  // }
+
+  // function pushChips(plane, num, dir, row, col, player) {
+  //   // num is number of blocks to be taken
+  //   for (let i=0; i<num; i++) {
+  //     if (plane === 'h') {
+  //       if (dir === 'neg') {
+  //         chipsToFlip.push('#'+row+(col-(i+1)).toString());
+  //         boardModel[row][col-(i+1)] = player;
+  //       }
+  //       if (dir === 'pos') {
+  //         chipsToFlip.push('#'+row+(col+(i+1)).toString());
+  //         boardModel[row][col+(i+1)] = player;
+  //       }
+  //     }
+  //     if (plane === 'v') {
+  //       if (dir === 'neg') {
+  //         chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col).toString());
+  //         boardModel[keys[keys.indexOf(row)-(i+1)]][col] = player;
+  //       }
+  //       if (dir === 'pos') {
+  //         chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col).toString());
+  //         boardModel[keys[keys.indexOf(row)+(i+1)]][col] = player;
+  //       }
+  //     }
+  //     if (plane === 'd1') {
+  //       if (dir === 'neg') {
+  //         chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col-(i+1)).toString());
+  //         boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] = player;
+  //       }
+  //       if (dir === 'pos') {
+  //         chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col+(i+1)).toString());
+  //         boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] = player;
+  //       }
+  //     }
+  //     if (plane === 'd2') {
+  //       if (dir === 'neg') {
+  //         chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col-(i+1)).toString());
+  //         boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] = player;
+  //       }
+  //       if (dir === 'pos') {
+  //         chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col+(i+1)).toString());
+  //         boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] = player;
+  //       }
+  //     }
+  //   } // end of loop
+  // } // end of pushChips function
 
   function numTiles(player) {
     let num = 0;
@@ -574,6 +449,7 @@ $(() => {
       if (!$(chipsToFlipLocal[i]).hasClass('N')) {
         if (player === 'B') whiteTaken++;
         if (player === 'W') blackTaken++;
+        boardModel[chipsToFlipLocal[i].split('')[1]][chipsToFlipLocal[i].split('')[2]] = player;
         $(chipsToFlipLocal[i]).removeClass(enemy);
         $(chipsToFlipLocal[i]).addClass(player);
       }
@@ -585,62 +461,62 @@ $(() => {
   } // end of doFlip function
 
   // I've rigged this function to do horizontal, vertical or diagonal checks based on input
-  function checkBoard(row, col, player, prev, next, plane) {
-    let enemy = '';
-    if (player === 'B') {
-      enemy = 'W';
-    }else {
-      enemy = 'B';
-    }
-    if (next[0] === enemy && next[1] === player) {
-      legal = true;
-      pushChips(plane, 1, 'pos', row, col, player);
-    }
-    if (prev[0] === enemy && prev[1] === player) {
-      legal = true;
-      pushChips(plane, 1, 'neg', row, col, player);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === player) {
-      legal = true;
-      pushChips(plane, 2, 'pos', row, col, player);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === player) {
-      legal = true;
-      pushChips(plane, 2, 'neg', row, col, player);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === player) {
-      legal = true;
-      pushChips(plane, 3, 'pos', row, col, player);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === player) {
-      legal = true;
-      pushChips(plane, 3, 'neg', row, col, player);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === player) {
-      legal = true;
-      pushChips(plane, 4, 'pos', row, col, player);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === player) {
-      legal = true;
-      pushChips(plane, 4, 'neg', row, col, player);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === player) {
-      legal = true;
-      pushChips(plane, 5, 'pos', row, col, player);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === player) {
-      legal = true;
-      pushChips(plane, 5, 'neg', row, col, player);
-    }
-    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === enemy && next[6] === player) {
-      legal = true;
-      pushChips(plane, 6, 'pos', row, col, player);
-    }
-    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === enemy && prev[6] === player) {
-      legal = true;
-      pushChips(plane, 6, 'neg', row, col, player);
-    }
-  } // end of checkBoard function
+  // function checkBoard(row, col, player, prev, next, plane) {
+  //   let enemy = '';
+  //   if (player === 'B') {
+  //     enemy = 'W';
+  //   }else {
+  //     enemy = 'B';
+  //   }
+  //   if (next[0] === enemy && next[1] === player) {
+  //     legal = true;
+  //     pushChips(plane, 1, 'pos', row, col, player);
+  //   }
+  //   if (prev[0] === enemy && prev[1] === player) {
+  //     legal = true;
+  //     pushChips(plane, 1, 'neg', row, col, player);
+  //   }
+  //   if (next[0] === enemy && next[1] === enemy && next[2] === player) {
+  //     legal = true;
+  //     pushChips(plane, 2, 'pos', row, col, player);
+  //   }
+  //   if (prev[0] === enemy && prev[1] === enemy && prev[2] === player) {
+  //     legal = true;
+  //     pushChips(plane, 2, 'neg', row, col, player);
+  //   }
+  //   if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === player) {
+  //     legal = true;
+  //     pushChips(plane, 3, 'pos', row, col, player);
+  //   }
+  //   if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === player) {
+  //     legal = true;
+  //     pushChips(plane, 3, 'neg', row, col, player);
+  //   }
+  //   if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === player) {
+  //     legal = true;
+  //     pushChips(plane, 4, 'pos', row, col, player);
+  //   }
+  //   if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === player) {
+  //     legal = true;
+  //     pushChips(plane, 4, 'neg', row, col, player);
+  //   }
+  //   if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === player) {
+  //     legal = true;
+  //     pushChips(plane, 5, 'pos', row, col, player);
+  //   }
+  //   if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === player) {
+  //     legal = true;
+  //     pushChips(plane, 5, 'neg', row, col, player);
+  //   }
+  //   if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === enemy && next[6] === player) {
+  //     legal = true;
+  //     pushChips(plane, 6, 'pos', row, col, player);
+  //   }
+  //   if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === enemy && prev[6] === player) {
+  //     legal = true;
+  //     pushChips(plane, 6, 'neg', row, col, player);
+  //   }
+  // } // end of checkBoard function
 
   createBoard();
   // init(confirm('Yes for 2 player, no to play computer'));
