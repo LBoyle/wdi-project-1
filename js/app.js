@@ -1,7 +1,3 @@
-
-
-
-
 var CP = CP;
 
 $(() => {
@@ -9,7 +5,7 @@ $(() => {
   const keys = ['a','b','c','d','e','f','g','h'];
   const boardModel = {};
   let count = 0;
-  const chipsToFlip = [];
+  let chipsToFlip = [];
   let legal;
   let blackTaken = 0;
   let whiteTaken = 0;
@@ -31,21 +27,6 @@ $(() => {
   // 'h': ['N','N','N','N','N','N','N','N']
   //        0   1   2   3   4   5   6   7
   // };
-
-  // I will use this init function to choose game mode
-
-  // function init(confirm) {
-  //   console.log('Initialized');
-  //   //const confirm = confirm('Yes for 2 player, no to play computer');
-  //   if (confirm === true) {
-  //     console.log(confirm);
-  //     createBoard();
-  //   } else {
-  //     console.log(confirm);
-  //     createBoard();
-  //   }
-  // }
-
   function createBoard() {
     console.log('Initialized');
     gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
@@ -101,10 +82,8 @@ $(() => {
     }
     $body.append($header, $instr, $main, $scoreLeft, $scoreRight);
     if (gameMode === 'pvp') {
-      // $('.box').on('click', PvPController.bind(this));
       PvPController();
     } else if (gameMode === 'pvc') {
-      // $('.box').on('click', PvC.bind(this));
       PvCTimer();
     } else if (gameMode === 'cvc') {
       CvCTimer();
@@ -112,8 +91,9 @@ $(() => {
     legal = false;
   }
 
+  // these three functions handle the different play modes kind of.
+
   function CvCTimer() {
-    // setTimeout(function() {
     if (count === 0 || count % 2 === 0) {
       setTimeout(function() {
         CvC('B', 'W');
@@ -125,7 +105,6 @@ $(() => {
         CvCTimer();
       }, 100);
     }
-    // });
   }
 
   function PvCTimer() {
@@ -159,15 +138,14 @@ $(() => {
     }
   }
 
-  // CvC
+  // CvC, handles the computers' turn, and updates the DOM and boardModel
 
   function CvC(player, enemy) {
     count++;
-    // if (count < 64) {
     const cpResponse = CP.computerPlay(player, boardModel, keys);
     const row = cpResponse.split('')[1];
     const col = parseInt(cpResponse.split('')[2]);
-    isLegal(row, col, player);
+    isLegal2(row, col, player);
     if (legal === true) {
       boardModel[row][col] = player;
       doFlip(enemy, player, chipsToFlip);
@@ -181,17 +159,16 @@ $(() => {
       $counterR.text('Tiles: '+whiteTiles+' Taken: '+blackTaken);
       $counterL.text('Tiles: '+blackTiles+' Taken: '+whiteTaken);
     }
-    // }
   } // end of CvC function
 
-  // PvC, computer is still bound to click handler
+  // PvC, changed now to handle the players turn and update DOM
 
   function PvC(e, player, enemy) {
     if (!$(e.target).hasClass('clicked')) {
       const row = e.target.id.split('')[0];
       const col = parseInt(e.target.id.split('')[1]);
       count++;
-      isLegal(row, col, player);
+      isLegal2(row, col, player);
       if (legal === true) {
         boardModel[row][col] = player;
         doFlip(enemy, player, chipsToFlip);
@@ -211,9 +188,6 @@ $(() => {
     } // hasClass 'clicked'
   } // end of PvC function
 
-// Here is the new much shorter isLegal function
-// it does the same thing that my three long ass functions did
-
   // row= The letter of your board model
   // col= Numerical column of board model
   // current= Which player ('W'/'B') clicked
@@ -223,9 +197,9 @@ $(() => {
     const directions = [
       [-1,0], // N
       [-1,1], // NE
-      [0,1], // E
-      [1,1], // SE
-      [1,0], // S
+      [0,1],  // E
+      [1,1],  // SE
+      [1,0],  // S
       [1,-1], // SW
       [0,-1], // W
       [-1,-1] // NW
@@ -250,22 +224,22 @@ $(() => {
         // Find the value of the next square
         const nextSquare = boardModel[newRow][newCol];
         // Display options using border
-        // $(`#${newRow}${newCol}`).css('border-color', 'red');
-        // setTimeout(() => {
-        //   $(`#${newRow}${newCol}`).css('border-color', 'black');
-        // }, 500);
-
+        $(`#${newRow}${newCol}`).css('border-color', 'red');
+        setTimeout(() => {
+          $(`#${newRow}${newCol}`).css('border-color', 'black');
+        }, 500);
         if (nextSquare === 'N') {
           plane = [];
           break;
         } else if (nextSquare === current) {
           break;
         }
-
         plane.push(`#${newRow}${newCol}`);
       }
       if (plane.toString()) return plane;
     }).filter(Boolean);
+
+    console.log(options);
 
     // Could remove this legal flag?
     if (options.toString()) legal = true;
@@ -273,9 +247,9 @@ $(() => {
     options.forEach(pane => {
       pane.forEach(id => {
         chipsToFlip.push(id);
-        // boardModel[row][col-(i+1)] = player;
       });
     });
+    console.log(`chips to flip: ${chipsToFlip}`);
   } // end of isLegal function
 
   function numTiles(player) {
@@ -286,7 +260,6 @@ $(() => {
           num += 1;
         }
       }
-      //console.log(boardModel[keys[i]]);
     }
     return num;
   }
@@ -301,11 +274,146 @@ $(() => {
         $(chipsToFlipLocal[i]).addClass(player);
       }
     }
-    // this empties the global version
-    for (let i=chipsToFlip.length; i>=0; i--) {
-      chipsToFlip.pop([i]);
-    }
+
+    chipsToFlip = [];
+
   } // end of doFlip function
+
+  // I'm putting back the old logic for now because it works better and I'm sort of proud of it
+
+  function isLegal2(row, col, current) {
+    const prevRowData = [];
+    const nextRowData = [];
+    const prevColData = [];
+    const nextColData = [];
+    const tlTobrPrevData = [];
+    const tlTobrNextData = [];
+    const blTotrPrevData = [];
+    const blTotrNextData = [];
+    // 7 because I don't add the square you just clicked
+    for (let i=0; i<7; i++) {
+      // for the Row, trying to read from a Dict with
+      // dict[foo][outside range or undefined] returns undefined
+      prevRowData.push(boardModel[row][col-(i+1)]);
+      nextRowData.push(boardModel[row][col+(i+1)]);
+      // for Cols though, trying to read from a dict with
+      // dict[undefined][number or undefined]
+      // produces an error so I had to check each one individually
+      prevColData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col] : undefined);
+      nextColData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col] : undefined);
+      // this gets confusing
+      // can you believe it works though!?
+      tlTobrPrevData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
+      tlTobrNextData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
+      blTotrPrevData.push((boardModel[keys[keys.indexOf(row)+(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
+      blTotrNextData.push((boardModel[keys[keys.indexOf(row)-(i+1)]] !== undefined) ? boardModel[keys[keys.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
+    }
+    // changed to push all legal blocks to chipsToFilp to be flipped
+    // this function returns nothing
+    // I can now use the same one function to check all directions
+    checkBoardC(row, col, current, prevRowData, nextRowData, 'h');
+    checkBoardC(row, col, current, prevColData, nextColData, 'v');
+    checkBoardC(row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
+    checkBoardC(row, col, current, blTotrPrevData, blTotrNextData, 'd2');
+  }
+
+  // I've rigged this function to do horizontal, vertical or diagonal checks based on input
+  // checkBoardC(e, row, col, current, blTotrPrevData, blTotrNextData, 'd2');
+  function checkBoardC(row, col, player, prev, next, plane) {
+    let enemy = '';
+    if (player === 'B') {
+      enemy = 'W';
+    }else {
+      enemy = 'B';
+    }
+    if (next[0] === enemy && next[1] === player) {
+      legal = true;
+      pushChipsC(plane, 1, 'pos', row, col);
+    }
+    if (prev[0] === enemy && prev[1] === player) {
+      legal = true;
+      pushChipsC(plane, 1, 'neg', row, col);
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === player) {
+      legal = true;
+      pushChipsC(plane, 2, 'pos', row, col);
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === player) {
+      legal = true;
+      pushChipsC(plane, 2, 'neg', row, col);
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === player) {
+      legal = true;
+      pushChipsC(plane, 3, 'pos', row, col);
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === player) {
+      legal = true;
+      pushChipsC(plane, 3, 'neg', row, col);
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === player) {
+      legal = true;
+      pushChipsC(plane, 4, 'pos', row, col);
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === player) {
+      legal = true;
+      pushChipsC(plane, 4, 'neg', row, col);
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === player) {
+      legal = true;
+      pushChipsC(plane, 5, 'pos', row, col);
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === player) {
+      legal = true;
+      pushChipsC(plane, 5, 'neg', row, col);
+    }
+    if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === enemy && next[6] === player) {
+      legal = true;
+      pushChipsC(plane, 6, 'pos', row, col);
+    }
+    if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === enemy && prev[6] === player) {
+      legal = true;
+      pushChipsC(plane, 6, 'neg', row, col);
+    }
+  } // end of checkBoard function
+
+  // pushChipsC(plane, 1, 'pos', row, col);
+  function pushChipsC(plane, num, dir, row, col) {
+    // num is number of blocks to be taken
+    for (let i=0; i<num; i++) {
+      if (plane === 'h') {
+        if (dir === 'neg') {
+          chipsToFlip.push('#'+row+(col-(i+1)).toString());
+        }
+        if (dir === 'pos') {
+          chipsToFlip.push('#'+row+(col+(i+1)).toString());
+        }
+      }
+      if (plane === 'v') {
+        if (dir === 'neg') {
+          chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col).toString());
+        }
+        if (dir === 'pos') {
+          chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col).toString());
+        }
+      }
+      if (plane === 'd1') {
+        if (dir === 'neg') {
+          chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col-(i+1)).toString());
+        }
+        if (dir === 'pos') {
+          chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col+(i+1)).toString());
+        }
+      }
+      if (plane === 'd2') {
+        if (dir === 'neg') {
+          chipsToFlip.push('#'+(keys[keys.indexOf(row)+(i+1)])+(col-(i+1)).toString());
+        }
+        if (dir === 'pos') {
+          chipsToFlip.push('#'+(keys[keys.indexOf(row)-(i+1)])+(col+(i+1)).toString());
+        }
+      }
+    } // end of loop
+  } // end of pushChips function
 
   createBoard();
 });
