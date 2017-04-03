@@ -98,7 +98,7 @@ $(() => {
       let col = parseInt(e.target.id.split('')[1]);
       count++;
       if (count === 0 || count % 2 === 0) {
-        const cpResponse = computerPlay('W');
+        const cpResponse = CP.computerPlay('W', boardModel, keys);
         row = cpResponse.split('')[1];
         col = parseInt(cpResponse.split('')[2]);
         isLegal(e, row, col, 'W');
@@ -314,56 +314,58 @@ $(() => {
 
   // Here I'm prototyping the computer player
 
-  function computerPlay(player) {
-    // copy vars from parent
-    const board = boardModel;
-    const keysC = keys;
-    // create new vars
-    const abacus = {};
-    // const boardModelC = {};
-    const chipsThisTurn = [];
-    const possibleSquares = [];
-    let chosenSquare = '';
+  var CP = CP || {};
 
-    function getChoice() {
-      for (let i=0; i<keysC.length; i++) {
+  CP.computerPlay = function(player, boardModel, keys) {
+    // copy vars from parent
+    CP.board = boardModel;
+    CP.keysC = keys;
+    // create new vars
+    CP.abacus = {};
+    CP.chipsThisTurn = []; // reassigned every loop
+    CP.possibleSquares = []; // one added to every loop, if it can score
+    CP.chosenSquare = ''; // take the first from possible squares 
+
+    CP.getChoice = function() {
+      // this function is pretty procedural, but it works.
+      for (let i=0; i<CP.keysC.length; i++) {
         for (let j=0; j<8; j++) {
-          const thisId = '#'+keysC[i]+(j).toString();
-          isLegalC(keysC[i], j, player);
-          const takeable = chipsThisTurn.length;
-          abacus[thisId] = takeable;
-          for (let i=chipsThisTurn.length; i>=0; i--) {
-            chipsThisTurn.pop([i]);
+          const thisId = '#'+CP.keysC[i]+(j).toString();
+          CP.isLegalC(CP.keysC[i], j, player);
+          const takeable = CP.chipsThisTurn.length;
+          CP.abacus[thisId] = takeable;
+          for (let i=CP.chipsThisTurn.length; i>=0; i--) {
+            CP.chipsThisTurn.pop([i]);
           }
         }
       }
       let counter = 0;
-      console.log(abacus);
-      const beanKeys = Object.keys(abacus);
+      // console.log(CP.abacus);
+      const beanKeys = Object.keys(CP.abacus);
       for (let i=0; i<beanKeys.length; i++) {
-        if (abacus[beanKeys[i]] > counter) {
+        if (CP.abacus[beanKeys[i]] > counter) {
           if ($(beanKeys[i]).hasClass('N')) {
-            counter = abacus[beanKeys[i]];
-            console.log(abacus[beanKeys[i]]);
+            counter = CP.abacus[beanKeys[i]];
+            // console.log(CP.abacus[beanKeys[i]]);
           }
         }
       }
       for (let i=0; i<beanKeys.length; i++) {
-        if (abacus[beanKeys[i]] === counter) {
-          console.log(beanKeys[i]);
+        if (CP.abacus[beanKeys[i]] === counter) {
+          // console.log(beanKeys[i]);
           if ($(beanKeys[i]).hasClass('N')) {
-            possibleSquares.push(beanKeys[i]);
+            CP.possibleSquares.push(beanKeys[i]);
           }
         }
       }
-      chosenSquare = possibleSquares[0];
-      console.log(possibleSquares);
-      console.log(chosenSquare);
-    }
+      CP.chosenSquare = CP.possibleSquares[0];
+      // console.log(CP.possibleSquares);
+      // console.log(CP.chosenSquare);
+    }; // end of getChoice function
 
     ///////////////// function returns chosenSquare at the end
 
-    function isLegalC(row, col, current) {
+    CP.isLegalC = function(row, col, current) {
       const prevRowData = [];
       const nextRowData = [];
       const prevColData = [];
@@ -376,32 +378,32 @@ $(() => {
       for (let i=0; i<7; i++) {
         // for the Row, trying to read from a Dict with
         // dict[foo][outside range or undefined] returns undefined
-        prevRowData.push(board[row][col-(i+1)]);
-        nextRowData.push(board[row][col+(i+1)]);
+        prevRowData.push(CP.board[row][col-(i+1)]);
+        nextRowData.push(CP.board[row][col+(i+1)]);
         // for Cols though, trying to read from a dict with
         // dict[undefined][number or undefined]
         // produces an error so I had to check each one individually
-        prevColData.push((board[keysC[keysC.indexOf(row)-(i+1)]] !== undefined) ? board[keysC[keysC.indexOf(row)-(i+1)]][col] : undefined);
-        nextColData.push((board[keysC[keysC.indexOf(row)+(i+1)]] !== undefined) ? board[keysC[keysC.indexOf(row)+(i+1)]][col] : undefined);
+        prevColData.push((CP.board[CP.keysC[CP.keysC.indexOf(row)-(i+1)]] !== undefined) ? CP.board[CP.keysC[CP.keysC.indexOf(row)-(i+1)]][col] : undefined);
+        nextColData.push((CP.board[CP.keysC[CP.keysC.indexOf(row)+(i+1)]] !== undefined) ? CP.board[CP.keysC[CP.keysC.indexOf(row)+(i+1)]][col] : undefined);
         // this gets confusing
         // can you believe it works though!?
-        tlTobrPrevData.push((board[keysC[keysC.indexOf(row)-(i+1)]] !== undefined) ? board[keysC[keysC.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
-        tlTobrNextData.push((board[keysC[keysC.indexOf(row)+(i+1)]] !== undefined) ? board[keysC[keysC.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
-        blTotrPrevData.push((board[keysC[keysC.indexOf(row)+(i+1)]] !== undefined) ? board[keysC[keysC.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
-        blTotrNextData.push((board[keysC[keysC.indexOf(row)-(i+1)]] !== undefined) ? board[keysC[keysC.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
+        tlTobrPrevData.push((CP.board[CP.keysC[CP.keysC.indexOf(row)-(i+1)]] !== undefined) ? CP.board[CP.keysC[CP.keysC.indexOf(row)-(i+1)]][col-(i+1)] : undefined);
+        tlTobrNextData.push((CP.board[CP.keysC[CP.keysC.indexOf(row)+(i+1)]] !== undefined) ? CP.board[CP.keysC[CP.keysC.indexOf(row)+(i+1)]][col+(i+1)] : undefined);
+        blTotrPrevData.push((CP.board[CP.keysC[CP.keysC.indexOf(row)+(i+1)]] !== undefined) ? CP.board[CP.keysC[CP.keysC.indexOf(row)+(i+1)]][col-(i+1)] : undefined);
+        blTotrNextData.push((CP.board[CP.keysC[CP.keysC.indexOf(row)-(i+1)]] !== undefined) ? CP.board[CP.keysC[CP.keysC.indexOf(row)-(i+1)]][col+(i+1)] : undefined);
       }
       // changed to push all legal blocks to chipsToFilp to be flipped
       // this function returns nothing
       // I can now use the same one function to check all directions
-      checkBoardC(row, col, current, prevRowData, nextRowData, 'h');
-      checkBoardC(row, col, current, prevColData, nextColData, 'v');
-      checkBoardC(row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
-      checkBoardC(row, col, current, blTotrPrevData, blTotrNextData, 'd2');
-    }
+      CP.checkBoardC(row, col, current, prevRowData, nextRowData, 'h');
+      CP.checkBoardC(row, col, current, prevColData, nextColData, 'v');
+      CP.checkBoardC(row, col, current, tlTobrPrevData, tlTobrNextData, 'd1');
+      CP.checkBoardC(row, col, current, blTotrPrevData, blTotrNextData, 'd2');
+    };
 
     // I've rigged this function to do horizontal, vertical or diagonal checks based on input
     // checkBoardC(e, row, col, current, blTotrPrevData, blTotrNextData, 'd2');
-    function checkBoardC(row, col, player, prev, next, plane) {
+    CP.checkBoardC = function(row, col, player, prev, next, plane) {
       let enemy = '';
       if (player === 'B') {
         enemy = 'W';
@@ -410,96 +412,96 @@ $(() => {
       }
       if (next[0] === enemy && next[1] === player) {
         legal = true;
-        pushChipsC(plane, 1, 'pos', row, col);
+        CP.pushChipsC(plane, 1, 'pos', row, col);
       }
       if (prev[0] === enemy && prev[1] === player) {
         legal = true;
-        pushChipsC(plane, 1, 'neg', row, col);
+        CP.pushChipsC(plane, 1, 'neg', row, col);
       }
       if (next[0] === enemy && next[1] === enemy && next[2] === player) {
         legal = true;
-        pushChipsC(plane, 2, 'pos', row, col);
+        CP.pushChipsC(plane, 2, 'pos', row, col);
       }
       if (prev[0] === enemy && prev[1] === enemy && prev[2] === player) {
         legal = true;
-        pushChipsC(plane, 2, 'neg', row, col);
+        CP.pushChipsC(plane, 2, 'neg', row, col);
       }
       if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === player) {
         legal = true;
-        pushChipsC(plane, 3, 'pos', row, col);
+        CP.pushChipsC(plane, 3, 'pos', row, col);
       }
       if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === player) {
         legal = true;
-        pushChipsC(plane, 3, 'neg', row, col);
+        CP.pushChipsC(plane, 3, 'neg', row, col);
       }
       if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === player) {
         legal = true;
-        pushChipsC(plane, 4, 'pos', row, col);
+        CP.pushChipsC(plane, 4, 'pos', row, col);
       }
       if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === player) {
         legal = true;
-        pushChipsC(plane, 4, 'neg', row, col);
+        CP.pushChipsC(plane, 4, 'neg', row, col);
       }
       if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === player) {
         legal = true;
-        pushChipsC(plane, 5, 'pos', row, col);
+        CP.pushChipsC(plane, 5, 'pos', row, col);
       }
       if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === player) {
         legal = true;
-        pushChipsC(plane, 5, 'neg', row, col);
+        CP.pushChipsC(plane, 5, 'neg', row, col);
       }
       if (next[0] === enemy && next[1] === enemy && next[2] === enemy && next[3] === enemy && next[4] === enemy && next[5] === enemy && next[6] === player) {
         legal = true;
-        pushChipsC(plane, 6, 'pos', row, col);
+        CP.pushChipsC(plane, 6, 'pos', row, col);
       }
       if (prev[0] === enemy && prev[1] === enemy && prev[2] === enemy && prev[3] === enemy && prev[4] === enemy && prev[5] === enemy && prev[6] === player) {
         legal = true;
-        pushChipsC(plane, 6, 'neg', row, col);
+        CP.pushChipsC(plane, 6, 'neg', row, col);
       }
-    } // end of checkBoard function
+    }; // end of checkBoard function
 
-    // pushChipsC(plane, 1, 'pos', row, col, player);
-    function pushChipsC(plane, num, dir, row, col) {
+    // pushChipsC(plane, 1, 'pos', row, col);
+    CP.pushChipsC = function(plane, num, dir, row, col) {
       // num is number of blocks to be taken
       for (let i=0; i<num; i++) {
         if (plane === 'h') {
           if (dir === 'neg') {
-            chipsThisTurn.push('#'+row+(col-(i+1)).toString());
+            CP.chipsThisTurn.push('#'+row+(col-(i+1)).toString());
           }
           if (dir === 'pos') {
-            chipsThisTurn.push('#'+row+(col+(i+1)).toString());
+            CP.chipsThisTurn.push('#'+row+(col+(i+1)).toString());
           }
         }
         if (plane === 'v') {
           if (dir === 'neg') {
-            chipsThisTurn.push('#'+(keysC[keysC.indexOf(row)-(i+1)])+(col).toString());
+            CP.chipsThisTurn.push('#'+(CP.keysC[CP.keysC.indexOf(row)-(i+1)])+(col).toString());
           }
           if (dir === 'pos') {
-            chipsThisTurn.push('#'+(keysC[keysC.indexOf(row)+(i+1)])+(col).toString());
+            CP.chipsThisTurn.push('#'+(CP.keysC[CP.keysC.indexOf(row)+(i+1)])+(col).toString());
           }
         }
         if (plane === 'd1') {
           if (dir === 'neg') {
-            chipsThisTurn.push('#'+(keysC[keysC.indexOf(row)-(i+1)])+(col-(i+1)).toString());
+            CP.chipsThisTurn.push('#'+(CP.keysC[CP.keysC.indexOf(row)-(i+1)])+(col-(i+1)).toString());
           }
           if (dir === 'pos') {
-            chipsThisTurn.push('#'+(keysC[keysC.indexOf(row)+(i+1)])+(col+(i+1)).toString());
+            CP.chipsThisTurn.push('#'+(CP.keysC[CP.keysC.indexOf(row)+(i+1)])+(col+(i+1)).toString());
           }
         }
         if (plane === 'd2') {
           if (dir === 'neg') {
-            chipsThisTurn.push('#'+(keysC[keysC.indexOf(row)+(i+1)])+(col-(i+1)).toString());
+            CP.chipsThisTurn.push('#'+(CP.keysC[CP.keysC.indexOf(row)+(i+1)])+(col-(i+1)).toString());
           }
           if (dir === 'pos') {
-            chipsThisTurn.push('#'+(keysC[keysC.indexOf(row)-(i+1)])+(col+(i+1)).toString());
+            CP.chipsThisTurn.push('#'+(CP.keysC[CP.keysC.indexOf(row)-(i+1)])+(col+(i+1)).toString());
           }
         }
       } // end of loop
-    } // end of pushChips function
-    getChoice();
-    return chosenSquare;
+    }; // end of pushChips function
+    CP.getChoice();
+    return CP.chosenSquare;
 
-  } // end of computerPlay function
+  }; // end of computerPlay function
 
 ////////////////////////////////////////////
 
