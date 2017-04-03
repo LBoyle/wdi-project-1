@@ -3,13 +3,14 @@
 // the refactored game logic in the other file makes mistakes
 
 var CP = CP || {
-  computerPlay(player, boardModel, keys) {
+  computerPlay(player, boardModel, keys, count) {
     // console.log(this);
     // console.log(this);
     // copy vars from parent
     this.board = boardModel;
     this.keysC = keys;
     this.legal = false;
+    this.count = count;
     // create new vars
     this.abacus = {};
     this.chipsThisTurn = []; // reassigned every loop
@@ -36,24 +37,28 @@ var CP = CP || {
     }
     let counter = 0;
     // console.log(this.abacus);
-    const beanKeys = Object.keys(this.abacus);
-    for (let i=0; i<beanKeys.length; i++) {
-      if (this.abacus[beanKeys[i]] > counter) {
-        if ($(beanKeys[i]).hasClass('N')) {
-          counter = this.abacus[beanKeys[i]];
-          // console.log(this.abacus[beanKeys[i]]);
+    const resultKeys = Object.keys(this.abacus);
+    for (let i=0; i<resultKeys.length; i++) {
+      if (this.abacus[resultKeys[i]] > counter) {
+        if ($(resultKeys[i]).hasClass('N')) {
+          counter = this.abacus[resultKeys[i]];
+          // console.log(this.abacus[resultKeys[i]]);
         }
       }
     }
-    for (let i=0; i<beanKeys.length; i++) {
-      if (this.abacus[beanKeys[i]] === counter) {
-        // console.log(beanKeys[i]);
-        if ($(beanKeys[i]).hasClass('N')) {
-          this.possibleSquares.push(beanKeys[i]);
+    for (let i=0; i<resultKeys.length; i++) {
+      if (this.abacus[resultKeys[i]] === counter) {
+        // console.log(resultKeys[i]);
+        if ($(resultKeys[i]).hasClass('N')) {
+          this.possibleSquares.push(resultKeys[i]);
         }
       }
     }
-    this.chosenSquare = this.possibleSquares[0];
+    // This bit is the money shot
+    // alternating between first and last, hopefully to get some variation in the CvC gameplay
+    (this.count === 0 || this.count %2 === 0) ? this.chosenSquare = this.possibleSquares[this.possibleSquares.length-1]: this.chosenSquare = this.possibleSquares[0];
+
+    // this.chosenSquare = this.possibleSquares[this.possibleSquares.length-1];
     // console.log(this.possibleSquares);
     // console.log(this.chosenSquare);
   }, // end of getChoice function

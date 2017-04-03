@@ -142,7 +142,7 @@ $(() => {
 
   function CvC(player, enemy) {
     count++;
-    const cpResponse = CP.computerPlay(player, boardModel, keys);
+    const cpResponse = CP.computerPlay(player, boardModel, keys, count);
     const row = cpResponse.split('')[1];
     const col = parseInt(cpResponse.split('')[2]);
     isLegal2(row, col, player);
