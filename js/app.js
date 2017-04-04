@@ -29,8 +29,8 @@ $(() => {
   // };
   function createBoard() {
     console.log('Initialized');
-    gameMode = 'pvc';
-    // gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
+    // gameMode = 'pvc';
+    gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
     const $body = $('body');
     const $header = $(document.createElement('h1'));
     const $instr = $(document.createElement('p'));
