@@ -29,7 +29,8 @@ $(() => {
   // };
   function createBoard() {
     console.log('Initialized');
-    gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
+    gameMode = 'pvp';
+    // gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
     const $body = $('body');
     const $header = $(document.createElement('h1'));
     const $instr = $(document.createElement('p'));
@@ -145,7 +146,7 @@ $(() => {
     const cpResponse = CP.computerPlay(player, boardModel, keys, count);
     const row = cpResponse.split('')[1];
     const col = parseInt(cpResponse.split('')[2]);
-    isLegal2(row, col, player);
+    isLegal(row, col, player);
     if (legal === true) {
       boardModel[row][col] = player;
       doFlip(enemy, player, chipsToFlip);
@@ -168,7 +169,7 @@ $(() => {
       const row = e.target.id.split('')[0];
       const col = parseInt(e.target.id.split('')[1]);
       count++;
-      isLegal2(row, col, player);
+      isLegal(row, col, player);
       if (legal === true) {
         boardModel[row][col] = player;
         doFlip(enemy, player, chipsToFlip);
@@ -215,20 +216,23 @@ $(() => {
       for (let j = 0; j < 7; j++) {
         // Currently keys are an array of letters
         // So we need to find the rows' index
-        const rowIndex  = keys.indexOf(newRow);
+        const rowIndex   = keys.indexOf(newRow);
         // Find the new row & column
-        newRow          = keys[rowIndex + rowChange];
-        newCol          = newCol + colChange;
-        // Optimisation here... instead of continue?
-        if (!newRow || newCol > 7 || newCol < 0) continue;
+        newRow           = keys[rowIndex + rowChange];
+        newCol           = newCol + colChange;
         // Find the value of the next square
         const nextSquare = boardModel[newRow][newCol];
+
         // Display options using border
-        $(`#${newRow}${newCol}`).css('border-color', 'red');
-        setTimeout(() => {
-          $(`#${newRow}${newCol}`).css('border-color', 'black');
-        }, 500);
-        if (nextSquare === 'N') {
+        // $(`#${newRow}${newCol}`).css('border-color', 'red');
+        // setTimeout(() => {
+        //   $(`#${newRow}${newCol}`).css('border-color', 'black');
+        // }, 500);
+
+        // if (!newRow || newCol > 7 || newCol < 0) continue;
+        // ^^ didn't work, reassigning plane and break;ing seems to work fine
+        if (invalidMove(newRow, newCol, nextSquare)) {
+        // if (typeof newRow === 'undefined' || newCol > 7 || newCol < 0 || nextSquare === 'N') {
           plane = [];
           break;
         } else if (nextSquare === current) {
@@ -239,8 +243,6 @@ $(() => {
       if (plane.toString()) return plane;
     }).filter(Boolean);
 
-    console.log(options);
-
     // Could remove this legal flag?
     if (options.toString()) legal = true;
 
@@ -249,8 +251,24 @@ $(() => {
         chipsToFlip.push(id);
       });
     });
-    console.log(`chips to flip: ${chipsToFlip}`);
+
   } // end of isLegal function
+
+  function invalidMove(row, col, square) {
+    return validRow(row) || validColumn(col) || emptySquare(square);
+  }
+
+  function validRow(row) {
+    return typeof row === 'undefined';
+  }
+
+  function validColumn(col) {
+    return col > 7 || col < 0;
+  }
+
+  function emptySquare(square) {
+    return square === 'N';
+  }
 
   function numTiles(player) {
     let num = 0;
@@ -279,6 +297,8 @@ $(() => {
 
   } // end of doFlip function
 
+
+  ////////////////////////////////////////////////////////
   // I'm putting back the old logic for now because it works better and I'm sort of proud of it
 
   function isLegal2(row, col, current) {
