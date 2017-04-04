@@ -35,6 +35,7 @@ var CP = CP || {
         }
       }
     }
+    // the counter is the highest score for any legal move,
     let counter = 0;
     // console.log(this.abacus);
     const resultKeys = Object.keys(this.abacus);
@@ -46,6 +47,7 @@ var CP = CP || {
         }
       }
     }
+    // I make a list of the highest scoring moves, then choose one at the end of the function
     for (let i=0; i<resultKeys.length; i++) {
       if (this.abacus[resultKeys[i]] === counter) {
         // console.log(resultKeys[i]);
