@@ -1,63 +1,37 @@
+/* linter brace-style off */
 var CP = CP;
 
 $(() => {
   // N not assigned, B black, W white
   const keys = ['a','b','c','d','e','f','g','h'];
   const boardModel = {};
-  let count = 0;
   let chipsToFlip = [];
   let legal;
-  let blackTaken = 0;
-  let whiteTaken = 0;
-  let blackTiles = 0;
-  let whiteTiles = 0;
+  let blackTiles, whiteTiles, count = 0;
   const $counterL = $(document.createElement('p'));
   const $counterR = $(document.createElement('p'));
+  const $instr = $(document.createElement('p'));
   let gameMode = '';
-  //var boardModel = {
-  //  this is what the starting board looks like
-  //  I'm keeping it here to help visualise the board
-  // 'a': ['N','N','N','N','N','N','N','N'],
-  // 'b': ['N','N','N','N','N','N','N','N'],
-  // 'c': ['N','N','N','N','N','N','N','N'],
-  // 'd': ['N','N','N','W','B','N','N','N'],
-  // 'e': ['N','N','N','B','W','N','N','N'],
-  // 'f': ['N','N','N','N','N','N','N','N'],
-  // 'g': ['N','N','N','N','N','N','N','N'],
-  // 'h': ['N','N','N','N','N','N','N','N']
-  //        0   1   2   3   4   5   6   7
-  // };
+
   function createBoard() {
-    console.log('Initialized');
-    // gameMode = 'pvc';
     gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
     const $body = $('body');
     const $header = $(document.createElement('h1'));
-    const $instr = $(document.createElement('p'));
     $header.text('Othello');
-    if (gameMode === 'pvp') {
-      $instr.text('Player vs Player');
-    }
-    if (gameMode === 'pvc') {
-      $instr.text('Player vs Computer');
-    }
-    if (gameMode === 'cvc') {
-      $instr.text('Computer vs it\'s self');
-    }
     const $scoreLeft = $(document.createElement('div'));
     const $scoreRight = $(document.createElement('div'));
     $scoreLeft.addClass('scoreLeft');
     $scoreRight.addClass('scoreRight');
     const $titleLeft = ($(document.createElement('h3')));
     const $titleRight  = ($(document.createElement('h3')));
-    $titleLeft.addClass('left');
-    $titleRight.addClass('right');
+    $titleLeft.attr('id','B');
+    $titleRight.attr('id', 'W');
     $titleLeft.text('Black, to start');
     $titleRight.text('White, go second');
     $scoreLeft.append($titleLeft);
     $scoreRight.append($titleRight);
-    $counterL.text('Tiles: 2 Taken: '+blackTaken);
-    $counterR.text('Tiles: 2 Taken: '+whiteTaken);
+    $counterL.text('Tiles: 2');
+    $counterR.text('Tiles: 2');
     $scoreLeft.append($counterL);
     $scoreRight.append($counterR);
     const $main = $(document.createElement('main'));
@@ -76,114 +50,113 @@ $(() => {
           boardModel[keys[i]][j] = 'W';
           $box.addClass('W clicked');
         } else {
-          $box.addClass('N');
+          $box.addClass('N'); // this conditional creates the starting squares and assigns the 'N' class
         }
         $main.append($box);
       }
     }
     $body.append($header, $instr, $main, $scoreLeft, $scoreRight);
-    if (gameMode === 'pvp') {
-      PvPController();
-    } else if (gameMode === 'pvc') {
-      PvCTimer();
-    } else if (gameMode === 'cvc') {
-      CvCTimer();
-    }
+    taskDist();
     legal = false;
   }
 
-  // these three functions handle the different play modes kind of.
-
-  function CvCTimer() {
-    if (count === 0 || count % 2 === 0) {
-      setTimeout(function() {
-        PorC(undefined, 'B', 'W');
-        CvCTimer();
-      }, 300);
+  function taskDist() {
+    if (CP.anyLegalMoves(getPlayer()[0], boardModel, keys, count) && CP.anyLegalMoves(getPlayer()[1], boardModel, keys, count)) {
+      if (gameMode === 'pvp') {
+        $instr.text('Player vs Player');
+        playerController();
+      } else if (gameMode === 'pvc') {
+        $instr.text('Player vs Computer');
+        (count === 0 || count % 2 === 0) ? playerController() : compController();
+      } else if (gameMode === 'cvc') {
+        $instr.text('Computer vs it\'s self');
+        compController();
+      }
     } else {
-      setTimeout(function() {
-        PorC(undefined, 'W', 'B');
-        CvCTimer();
-      }, 300);
+      hasWinner();
     }
   }
 
-  function PvCTimer() {
-    if (count === 0 || count % 2 === 0) {
-      $('.box').on('click', function(e) {
-        PorC(e, 'B', 'W');
-        $('.box').off();
-        PvCTimer();
-      });
-    } else {
-      setTimeout(function() {
-        PorC(undefined, 'W', 'B');
-        PvCTimer();
-      }, 500);
-    }
-  }
-
-  function PvPController() { // not a timer
-    if (count === 0 || count % 2 === 0) {
+  function playerController() {
+    console.log('legal moves for player?'+CP.anyLegalMoves(getPlayer()[0], boardModel, keys, count));
+    if (CP.anyLegalMoves(getPlayer()[0], boardModel, keys, count)) {
       $('.box').on('click', (e) => {
-        PorC(e, 'B', 'W');
+        checkInput(e, getPlayer()[0], getPlayer()[1]);
         $('.box').off();
-        PvPController();
+        taskDist();
       });
     } else {
-      $('.box').on('click', (e) => {
-        PorC(e, 'W', 'B');
-        $('.box').off();
-        PvPController();
-      });
+      count++;
+      taskDist();
     }
   }
 
-  function PorC(e, player, enemy) {
+  function compController() {
+    setTimeout(function() {
+      checkInput(undefined, getPlayer()[0], getPlayer()[1]);
+      taskDist();
+    }, 200); // wait 0.2 seconds before the computer makes its play
+  }
+
+  function getPlayer() {
+    return [(count === 0 || count % 2 === 0) ? 'B' : 'W', (count === 0 || count % 2 === 0) ? 'W' : 'B'];
+  }
+
+  function hasWinner() {
+    const winner = findWinner();
+    $instr.text(`Game over, winner is ${winner}`);
+  }
+  function findWinner() {return (whiteTiles > blackTiles) ? 'White' : 'Black';}
+
+  function checkInput(e, player, enemy) {
     let row = '';
     let col = 0;
-    if (e) {
+    if (e) { // if e hav been delivered by a click event, either event or undefined
       if (!$(e.target).hasClass('clicked')) {
         row = e.target.id.split('')[0];
         col = parseInt(e.target.id.split('')[1]);
         count++;
-        isLegal(row, col, player);
-        if (legal === true) {
-          play(player, enemy, row, col);
-        } else {
-          count--;
-        }
+        chipsToFlip = isLegal(row, col, player);
+        // console.log('legal moves for player?'+CP.anyLegalMoves(player, boardModel, keys, count));
+        (legal === true) ? play(player, enemy, row, col) : count--;
+        // if (!legalMovesRemaining(player)) count++;
       }
-    } else {
+    } else { // if e is undefined, it was the computer that sent a request
       count++;
       const cpResponse = CP.computerPlay(player, boardModel, keys, count);
-      console.log();
-      row = cpResponse.split('')[1];
-      col = parseInt(cpResponse.split('')[2]);
-      isLegal(row, col, player);
-      if (legal === true) {
-        play(player, enemy, row, col);
-      }
+      if (cpResponse.length > 0) {
+        row = cpResponse.split('')[1];
+        col = parseInt(cpResponse.split('')[2]);
+        chipsToFlip = isLegal(row, col, player);
+        return (legal === true) ? play(player, enemy, row, col) : $('#W').text('No legal moves');
+      } // else count++;
     } // hasClass 'clicked'
-  } // end of PvC function
+  } // end of check input function
+
   function play(player, enemy, row, col) {
     boardModel[row][col] = player;
     doFlip(enemy, player, chipsToFlip);
-    blackTiles = numTiles('B');
-    whiteTiles = numTiles('W');
+    numTiles();
+    legal = false;
+    tileAndDOM(player, enemy, row, col);
+  }
+
+  function tileAndDOM(player, enemy, row, col) {
+    const nPlayer = (player === 'W') ? 'White' : 'Black';
+    const nEnemy = (player === 'W') ? 'Black' : 'White';
     $(`#${row}${col}`).removeClass('N');
     $(`#${row}${col}`).addClass(player+' clicked');
-    legal = false;
-    $('.right').text('White, Your turn');
-    $('.left').text('Black team');
-    $counterL.text('Tiles: '+blackTiles+' Taken: '+whiteTaken);
-    $counterR.text('Tiles: '+whiteTiles+' Taken: '+blackTaken);
+    $(`#${enemy}`).text(`${nEnemy}, Your turn`);
+    $(`#${player}`).text(`${nPlayer} team`);
+    $counterL.text('Tiles: '+blackTiles);
+    $counterR.text('Tiles: '+whiteTiles);
   }
   // row= The letter of your board model
   // col= Numerical column of board model
   // current= Which player ('W'/'B') clicked
   function isLegal(row, col, current) {
     // Find possible planes In terms of [row, col]
+    const goodChips = [];
     const directions = [
       [-1,0], // N
       [-1,1], // NE
@@ -213,9 +186,7 @@ $(() => {
         if (invalidMove(newRow, newCol, nextSquare)) {
           plane = [];
           break;
-        } else if (nextSquare === current) {
-          break;
-        }
+        } else if (nextSquare === current) break;
         // I'm pretty sure this works properly, preventing certain illegal moves, alowing other legal moves
         if (checkLength(plane, newCol, newRow)) {
           plane = [];
@@ -225,64 +196,48 @@ $(() => {
       }
       if (plane.toString()) return plane;
     }).filter(Boolean);
-
     // Could remove this legal flag?
     if (possiblePlanes.toString()) legal = true;
-
-    possiblePlanes.forEach(flipPlanes);
-  } // end of isLegal function
-
-  function checkLength(plane, col, row) {
-    return plane.length >= 6 && (col === 7 || col === 0 || row === 'a' || row === 'h');
-  }
-
-  function invalidMove(row, col, square) {
-    return validRow(row) || validColumn(col) || emptySquare(square);
-  }
-
-  function validRow(row) {
-    return typeof row === 'undefined';
-  }
-
-  function validColumn(col) {
-    return col > 7 || col < 0;
-  }
-
-  function emptySquare(square) {
-    return square === 'N';
-  }
-
-  function flipPlanes(plane) {
-    plane.forEach(id => {
-      chipsToFlip.push(id);
+    possiblePlanes.forEach(plane => {
+      plane.forEach(id => {
+        goodChips.push(id);
+      });
     });
-  }
+    return goodChips;
+  } // end of isLegal function
+  //
+  function checkLength(plane, col, row) {return plane.length >= 6 && (col === 7 || col === 0 || row === 'a' || row === 'h');}
+  function invalidMove(row, col, square) {return validRow(row) || validColumn(col) || emptySquare(square);}
+  function validRow(row) {return typeof row === 'undefined';}
+  function validColumn(col) {return col > 7 || col < 0;}
+  function emptySquare(square) {return square === 'N';}
 
-  function numTiles(player) {
-    let num = 0;
+  function numTiles() {
+    let blks = 0;
+    let whts = 0;
     for (var i=0; i<keys.length; i++) {
       for (var j=0; j<boardModel[keys[i]].length; j++) {
-        if (boardModel[keys[i]][j] === player) {
-          num += 1;
-        }
+        if (boardModel[keys[i]][j] === 'B') blks++;
+        if (boardModel[keys[i]][j] === 'W') whts++;
       }
     }
-    return num;
+    blackTiles = blks;
+    whiteTiles = whts;
   }
 
   function doFlip(enemy, player, chipsToFlipLocal) {
     for (let i=0; i<chipsToFlipLocal.length; i++) {
       if (!$(chipsToFlipLocal[i]).hasClass('N')) {
-        if (player === 'B') whiteTaken++;
-        if (player === 'W') blackTaken++;
         boardModel[chipsToFlipLocal[i].split('')[1]][chipsToFlipLocal[i].split('')[2]] = player;
-        $(chipsToFlipLocal[i]).removeClass(enemy);
-        $(chipsToFlipLocal[i]).addClass(player);
+        switchClass(chipsToFlipLocal[i], player, enemy);
       }
     }
-
     chipsToFlip = [];
   } // end of doFlip function
 
+  function switchClass(squareId, player, enemy) {
+    $(squareId).removeClass(enemy);
+    $(squareId).addClass(player);
+  }
   createBoard();
 });

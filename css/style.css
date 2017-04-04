@@ -5,10 +5,10 @@ body {
   text-align: center;
   font-family: sans-serif;
 }
-p {
+/*p {
   color: white;
   text-shadow: 2px 2px black;
-}
+}*/
 main {
   width: 416px;
   height: 416px;
@@ -16,6 +16,12 @@ main {
   background-color: rgb(64, 85, 34);
   border: 3px solid rgb(60,40,20);
   border-radius: 10px;
+}
+footer {
+  position: relative;
+  color: white;
+  text-align: center;
+  
 }
 .box {
   /*margin: 0 0 -4px 0;*/
@@ -28,14 +34,6 @@ main {
 .N:hover {
   background-color: rgba(40, 50, 20, 0.8);
 }
-.B {
-  background-color: black;
-  color: white;
-  text-shadow: 2px 2px black;
-}
-.W {
-  background-color: white;
-}
 .scoreLeft, .scoreRight {
   display: inline-block;
   width: 195px;
@@ -43,6 +41,21 @@ main {
   background-color: rgb(64, 85, 34);
   border: 3px solid rgb(60,40,20);
   border-radius: 10px;
+}
+.scoreLeft, .B {
+  background-color: black;
+  color: white;
+  text-shadow: 2px 2px black;
+}
+.scoreRight, .W {
+  background-color: white;
+  color: black;
+}
+.scoreLeft {
+  background-color: rgba(0,0,0,0.7);
+}
+.scoreRight {
+  background-color: rgba(255,255,255,0.7);
 }
 @media screen and (max-width: 500px) {
   main {

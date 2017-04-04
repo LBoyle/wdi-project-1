@@ -1,3 +1,18 @@
+//var boardModel = {
+//  this is what the starting board looks like
+//  I'm keeping it here to help visualise the board
+// 'a': ['N','N','N','N','N','N','N','N'],
+// 'b': ['N','N','N','N','N','N','N','N'],
+// 'c': ['N','N','N','N','N','N','N','N'],
+// 'd': ['N','N','N','W','B','N','N','N'],
+// 'e': ['N','N','N','B','W','N','N','N'],
+// 'f': ['N','N','N','N','N','N','N','N'],
+// 'g': ['N','N','N','N','N','N','N','N'],
+// 'h': ['N','N','N','N','N','N','N','N']
+//        0   1   2   3   4   5   6   7
+// };
+
+
 Othello
 to start with the mvp will be two player, the goal is to make a computer player.
 this can be done easily in the DOM without using a canvas or some lib
@@ -100,7 +115,7 @@ I'm quite proud of this computer player, it's actually hard to beat, the best st
 Actually I have an idea about how to implement predicting a few moves ahead, for all potential moves returned by the computer player as it is now, apply the move to a local boardModel then do the same for the enemy. I can see it either splitting at every possible move, every high-scoring move, or not at all, only like the first few potentialities.
 
 I'm gonna aim to mod this computer to project ahead a few moves and take advantage of the projections to improve its game.
-It makes use of undefined variables and ints, no floats I think, doesn't attempt to look where it can't, I think it might not use that much hardware. Besides my macbook has a totally OP cpu. 
+It makes use of undefined variables and ints, no floats I think, doesn't attempt to look where it can't, I think it might not use that much hardware. Besides my macbook has a totally OP cpu.
 
 Also, still no win condition or end to the game, it just softlocks when neither player can move and you have to refresh.
 This violates the rules of Othello, if one player can't move but the other can, they should be able to make those moves, and there's no way to skip a go yet.
