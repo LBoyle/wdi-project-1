@@ -18,10 +18,10 @@ main {
   border-radius: 10px;
 }
 footer {
-  position: relative;
+
   color: white;
   text-align: center;
-  
+
 }
 .box {
   /*margin: 0 0 -4px 0;*/
@@ -56,6 +56,18 @@ footer {
 }
 .scoreRight {
   background-color: rgba(255,255,255,0.7);
+}
+.welcome {
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+  background-color: green;
+}
+.modeBtn {
+  display: inline-block;
+  width: 200px;
+  height: 100px;
+  background-color: red;
 }
 @media screen and (max-width: 500px) {
   main {

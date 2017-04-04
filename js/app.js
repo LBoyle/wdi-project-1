@@ -11,11 +11,25 @@ $(() => {
   const $counterL = $(document.createElement('p'));
   const $counterR = $(document.createElement('p'));
   const $instr = $(document.createElement('p'));
+  const $body = $('body');
   let gameMode = '';
+
+  function landingPage() {
+    const $welcome = $(document.createElement('div')).addClass('welcome');
+    $welcome.append($(document.createElement('h1')).text('Othello'));
+    $welcome.append($(document.createElement('h4')).text('choose mode'));
+    const ids = ['pvp', 'pvc', 'cvc'];
+    const btnText = ['<p>Player vs Player</p>','<p>Player vs Com</p>','<p>Com vs Com</p>'];
+    for (var i = 0; i < ids.length; i++) {
+      const $modeBtn = $(document.createElement('div')).addClass('modeBtn').attr('id',ids[i]).html(btnText[i]);
+
+      $welcome.append($modeBtn);
+    }
+    $body.append($welcome);
+  }
 
   function createBoard() {
     gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
-    const $body = $('body');
     const $header = $(document.createElement('h1'));
     $header.text('Othello');
     const $scoreLeft = $(document.createElement('div'));
@@ -61,7 +75,8 @@ $(() => {
   }
 
   function taskDist() {
-    if (CP.anyLegalMoves(getPlayer()[0], boardModel, keys, count) && CP.anyLegalMoves(getPlayer()[1], boardModel, keys, count)) {
+    // if (CP.anyLegalMoves(getPlayer()[0], boardModel, keys, count) && CP.anyLegalMoves(getPlayer()[1], boardModel, keys, count)) {
+    if ($('.N').length > 0) {
       if (gameMode === 'pvp') {
         $instr.text('Player vs Player');
         playerController();
@@ -73,7 +88,7 @@ $(() => {
         compController();
       }
     } else {
-      hasWinner();
+      hasWinner(findWinner());
     }
   }
 
@@ -102,10 +117,7 @@ $(() => {
     return [(count === 0 || count % 2 === 0) ? 'B' : 'W', (count === 0 || count % 2 === 0) ? 'W' : 'B'];
   }
 
-  function hasWinner() {
-    const winner = findWinner();
-    $instr.text(`Game over, winner is ${winner}`);
-  }
+  function hasWinner(winner) {$instr.text(`Game over, winner is ${winner}`);}
   function findWinner() {return (whiteTiles > blackTiles) ? 'White' : 'Black';}
 
   function checkInput(e, player, enemy) {
@@ -239,5 +251,6 @@ $(() => {
     $(squareId).removeClass(enemy);
     $(squareId).addClass(player);
   }
-  createBoard();
+  // createBoard();
+  landingPage();
 });
