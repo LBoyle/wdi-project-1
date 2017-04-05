@@ -125,8 +125,8 @@ var CP = CP || {
       }
       if (plane.toString()) return plane;
     }).filter(Boolean);
-    if (possiblePlanes.toString()) CP.legal = true;
-    possiblePlanes.forEach(CP.flipPlanes);
+    if (possiblePlanes.toString()) this.legal = true;
+    possiblePlanes.forEach(this.flipPlanes);
   }, // end of isLegal function
 
   checkLength(plane, col, row) {return plane.length >= 6 && (col === 7 || col === 0 || row === 'a' || row === 'h');},

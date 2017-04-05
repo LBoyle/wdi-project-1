@@ -1,5 +1,5 @@
 body {
-  background-image: url("http://static.tumblr.com/5964c3521b78dc6bde5abc3305b18f9a/7h0sds4/bMxmtka8w/tumblr_static_tabletop1.9.7.13.jpg");
+  background-image: url("/Users/louis/Development/wdi-project-1/img/wood-table-bg.jpg");
   background-color: #B8860B;
   text-shadow: 1px 1px grey;
   text-align: center;
@@ -34,6 +34,9 @@ footer {
 .N:hover {
   background-color: rgba(40, 50, 20, 0.8);
 }
+.instr {
+  color: white;
+}
 .scoreLeft, .scoreRight {
   display: inline-block;
   width: 195px;
@@ -58,16 +61,30 @@ footer {
   background-color: rgba(255,255,255,0.7);
 }
 .welcome {
-  width: 400px;
-  height: 400px;
+  padding-top: 50px;
+  width: 424px;
+  height: 424px;
   margin: 0 auto;
-  background-color: green;
+  background-image: url("/Users/louis/Development/wdi-project-1/img/board.png");
+  background-repeat: no-repeat;
 }
 .modeBtn {
   display: inline-block;
-  width: 200px;
-  height: 100px;
-  background-color: red;
+  padding: 22px;
+  margin: 20px;
+  width: 150px;
+  /*height: 50px;*/
+  background-color: rgb(255,255,255);
+  background-color: rgba(255,255,255,0.7);
+  border: 2px solid black;
+  border-radius: 10px;
+}
+/*#pvp, #pvc, #cvc {
+  padding-top: 10px;
+  padding-bottom: -10px;
+}*/
+.modeBtn:hover {
+  background-color: rgb(255,255,255);
 }
 @media screen and (max-width: 500px) {
   main {

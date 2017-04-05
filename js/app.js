@@ -10,28 +10,34 @@ $(() => {
   let blackTiles, whiteTiles, count = 0;
   const $counterL = $(document.createElement('p'));
   const $counterR = $(document.createElement('p'));
-  const $instr = $(document.createElement('p'));
+  const $instr = $(document.createElement('p')).addClass('instr');
   const $body = $('body');
   let gameMode = '';
 
   function landingPage() {
+    const $header = $(document.createElement('h1'));
+    $header.text('Othello');
+    $instr.text('Choose mode');
     const $welcome = $(document.createElement('div')).addClass('welcome');
-    $welcome.append($(document.createElement('h1')).text('Othello'));
-    $welcome.append($(document.createElement('h4')).text('choose mode'));
     const ids = ['pvp', 'pvc', 'cvc'];
-    const btnText = ['<p>Player vs Player</p>','<p>Player vs Com</p>','<p>Com vs Com</p>'];
+    const btnText = ['Player vs Player','Player vs Com','Com vs Com'];
     for (var i = 0; i < ids.length; i++) {
-      const $modeBtn = $(document.createElement('div')).addClass('modeBtn').attr('id',ids[i]).html(btnText[i]);
+      const $modeBtn = $(document.createElement('p')).addClass('modeBtn').attr('id',ids[i]).html(btnText[i]);
 
       $welcome.append($modeBtn);
     }
-    $body.append($welcome);
+    $body.append($header, $instr, $welcome);
+    $('.modeBtn').on('click', function(e) {
+      gameMode = e.target.id;
+      $('.welcome').remove();
+      createBoard();
+    });
   }
 
   function createBoard() {
-    gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
-    const $header = $(document.createElement('h1'));
-    $header.text('Othello');
+    // gameMode = prompt('Which mode? "PvP", "PvC" or "CvC"?').toLowerCase();
+    // const $header = $(document.createElement('h1'));
+    // $header.text('Othello');
     const $scoreLeft = $(document.createElement('div'));
     const $scoreRight = $(document.createElement('div'));
     $scoreLeft.addClass('scoreLeft');
@@ -69,7 +75,7 @@ $(() => {
         $main.append($box);
       }
     }
-    $body.append($header, $instr, $main, $scoreLeft, $scoreRight);
+    $body.append($main, $scoreLeft, $scoreRight);
     taskDist();
     legal = false;
   }
@@ -87,9 +93,7 @@ $(() => {
         $instr.text('Computer vs it\'s self');
         compController();
       }
-    } else {
-      hasWinner(findWinner());
-    }
+    } else hasWinner(findWinner());
   }
 
   function playerController() {
@@ -101,8 +105,11 @@ $(() => {
         taskDist();
       });
     } else {
-      count++;
-      taskDist();
+      setTimeout(function() {
+        $('#B').text('No legal moves');
+        count++;
+        taskDist();
+      }, 300);
     }
   }
 
@@ -113,12 +120,12 @@ $(() => {
     }, 200); // wait 0.2 seconds before the computer makes its play
   }
 
-  function getPlayer() {
-    return [(count === 0 || count % 2 === 0) ? 'B' : 'W', (count === 0 || count % 2 === 0) ? 'W' : 'B'];
-  }
-
+  function getPlayer() {return [(count === 0 || count % 2 === 0) ? 'B' : 'W', (count === 0 || count % 2 === 0) ? 'W' : 'B'];}
   function hasWinner(winner) {$instr.text(`Game over, winner is ${winner}`);}
-  function findWinner() {return (whiteTiles > blackTiles) ? 'White' : 'Black';}
+  function findWinner() {
+    if (whiteTiles === blackTiles) return 'Draw';
+    return (whiteTiles > blackTiles) ? 'White' : 'Black';
+  }
 
   function checkInput(e, player, enemy) {
     let row = '';
