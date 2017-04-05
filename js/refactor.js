@@ -1,136 +1,129 @@
 $(() => {
-  let gameMode = '';
-  let blackTiles, whiteTiles, count = 0;
-  const $body = $('body');
-  const keys = ['a','b','c','d','e','f','g','h'];
-  const boardModel = {};
-  function landingPage() {
-    const $header = $(document.createElement('h1')).text('Othello');
-    const $instr = $(document.createElement('p')).addClass('instr').text('Choose mode');
-    const $welcome = $(document.createElement('div')).addClass('welcome');
-    const ids = ['pvp', 'pvc', 'cvc'];
-    const btnText = ['Player vs Player','Player vs Com','Com vs Com'];
-    for (var i = 0; i < ids.length; i++) {
-      $welcome.append($(document.createElement('p')).addClass('modeBtn').attr('id',ids[i]).html(btnText[i]));
+  let gameMode = ''; // some global variables I haven't gotten rid of
+  let blackTiles, whiteTiles, count = 0; // track scores and whose turn it is
+  const $body = $('body'); // grab the body
+  const keys = ['a','b','c','d','e','f','g','h']; // list of the keys for the boardModel and IDs
+  const boardModel = {}; // a model of the board right now, updated every turn
+  function landingPage() { // that screen where you choose the game mode
+    const $header = $('<h1>').text('Othello');
+    const $instr = $('<p>', {class: 'instr'}).text('Choose mode');
+    const $welcome = $('<div>', {class: 'welcome'}); // make some stuff, I like jQuery
+    const ids = ['pvp', 'pvc', 'cvc']; ////////////////// ids for mode buttons
+    const btnText = ['Player vs Player','Player vs Com','Com vs Com']; // text to display in mode buttons
+    for (var i = 0; i < ids.length; i++) { // create three buttons
+      $welcome.append($('<p>', {class: 'modeBtn', id: ids[i]}).html(btnText[i])); // apply text and id
     }
-    $body.append($header, $instr, $welcome);
-    $('.modeBtn').on('click', function(e) {
-      gameMode = e.target.id;
-      $('.welcome').remove();
-      createBoard();
+    $body.append($header, $instr, $welcome); // append all this new stuff to the body, in order
+    $('.modeBtn').on('click', function(e) { // wait for the user to make a choice
+      gameMode = e.target.id; // the id is checked in the task distributor function
+      $('.welcome').remove(); // get rid of the whole welcome screen
+      createBoard(); // initiate the game
     });
   }
   function createBoard() {
-    const keys = ['a','b','c','d','e','f','g','h'];
-    const $scoreLeft = $(document.createElement('div')).addClass('scoreLeft');
-    const $scoreRight = $(document.createElement('div')).addClass('scoreRight');
-    const $titleLeft = $(document.createElement('h3')).attr('id','B').text('Black, to start');
-    const $titleRight  = $(document.createElement('h3')).attr('id', 'W').text('White, go second');
-    $scoreLeft.append($titleLeft);
-    $scoreRight.append($titleRight);
-    const $counterL = $(document.createElement('p')).attr('id', 'counterL').text('Tiles: 2');
-    const $counterR = $(document.createElement('p')).attr('id', 'counterR').text('Tiles: 2');
-    $scoreLeft.append($counterL);
-    $scoreRight.append($counterR);
-    const $main = $(document.createElement('main'));
-    for (var i=0; i<keys.length; i++) {
-      boardModel[keys[i]] = [];
-      for (var j=0; j<keys.length; j++) {
-        const $box = $(document.createElement('div')).addClass('box').attr('id', `${keys[i]}${j}`).html(`${keys[i]}${j}`);
-        boardModel[keys[i]][j] = 'N';
+    const $scoreLeft = $('<div>', {class: 'scoreLeft'}); // create DOM elements to be manipulated
+    const $scoreRight = $('<div>', {class: 'scoreRight'});
+    const $titleLeft = $('<h3>', {id: 'B'}).text('Black, to start');
+    const $titleRight  = $('<h3>', {id: 'W'}).text('White, go second');
+    const $counterL = $('<p>', {id: 'counterL'}).text('Tiles: 2');
+    const $counterR = $('<p>', {id: 'counterR'}).text('Tiles: 2');
+    $scoreLeft.append($titleLeft, $counterL);
+    $scoreRight.append($titleRight, $counterR); // join them all together
+    const $main = $('<main>'); // create the box that holds the game board
+    for (var i=0; i<keys.length; i++) { // first loop through keys
+      boardModel[keys[i]] = []; // make a space in the dictionary for each key
+      for (var j=0; j<keys.length; j++) { // then loop through 8 to create each square
+        const $box = $('<div>', {class: 'box', id: `${keys[i]}${j}`}).html(`${keys[i]}${j}`); // make each box
+        boardModel[keys[i]][j] = 'N'; // update the squares, init them all and 'N'ot assigned
         if ((keys[i] === 'd' && j === 4)||(keys[i] === 'e' && j === 3)) {
-          boardModel[keys[i]][j] = 'B';
-          $box.addClass('B clicked');
+          boardModel[keys[i]][j] = 'B'; // the center four squares are always this position
+          $box.addClass('B clicked'); // can't click squares with pieces on them
         } else if ((keys[i] === 'd' && j === 3)||(keys[i] === 'e' && j === 4)) {
-          boardModel[keys[i]][j] = 'W';
+          boardModel[keys[i]][j] = 'W'; // do the same for the white squares
           $box.addClass('W clicked');
-        } else {
-          $box.addClass('N'); // this conditional creates the starting squares and assigns the 'N' class
-        }
-        $main.append($box);
+        } else $box.addClass('N'); // this conditional creates the starting squares and assigns the 'N' class
+        $main.append($box); // append each box to the game board
       }
     }
-    $body.append($main, $scoreLeft, $scoreRight);
-    taskDist();
+    $body.append($main, $scoreLeft, $scoreRight); // append the new stuff to the body in order
+    taskDist(); // call task distributor that calls its self until a win
   }
-  function taskDist() {
-    if ($('.N').length > 0) {
+  function taskDist() { // this move switches game modes as chosen py the user
+    if ($('.N').length > 0) { // if there are free playable squares,
       if (gameMode === 'pvp') {
-        $('.instr').text('Player vs Player');
-        playerController();
+        $('.instr').text('Player vs Player'); // these update the DOM
+        playerController(); // call the function that handles players only
       } else if (gameMode === 'pvc') {
-        $('.instr').text('Player vs Computer');
+        $('.instr').text('Player vs Computer'); // switch between player and com based on count
         (count === 0 || count % 2 === 0) ? playerController() : compController();
       } else if (gameMode === 'cvc') {
         $('.instr').text('Computer vs it\'s self');
-        compController();
+        compController(); // this function sets the computer running
       }
-    } else hasWinner(findWinner()); // if there are no N squares left
-  }
-  function playerController() {
-    if (anyLegalMoves(getPlayer()[0], boardModel, keys)) {
-      $('.box').on('click', (e) => {
-        checkInput(e, getPlayer()[0], getPlayer()[1]);
-        $('.box').off();
-        taskDist();
+    } else hasWinner(findWinner()); // if there are no N squares left the game is over
+  } // don't know for certain about a win condition with empty sqares remaining, i think it's possible
+  function playerController() { // not for computers
+    if (anyLegalMoves(getPlayer()[0], boardModel, keys)) { // returns boolean to find if player has legal moves
+      $('.box').on('click', (e) => { // click event on all squares
+        checkInput(e, getPlayer()[0], getPlayer()[1]); // run the game logic, [0] is player [1] is enemy
+        $('.box').off(); // disable the click event so player can't interrupt the computer
+        taskDist(); // call the parent function again to wait for input
       });
     } else {
-      setTimeout(function() {
-        $('#'+getPlayer[0]).text('No legal moves');
-        count++;
-        taskDist();
-      }, 1000); // display player no moves
+      $('#'+getPlayer[0]).text('No legal moves'); // tell the player why they don't get a turn
+      count++; // skip this players turn if there are no legal moves, not tested because it's hard to pull off
+      taskDist(); // call the parent function again to wait for input
     }
   }
-  function compController() {
-    setTimeout(function() {
-      checkInput(undefined, getPlayer()[0], getPlayer()[1]);
-      taskDist();
+  function compController() { // this initiates a turn for the computer
+    setTimeout(function() { // set a timer so people don't feel like it's taking the piss, maybe it's thinking
+      checkInput(undefined, getPlayer()[0], getPlayer()[1]); // game logic again
+      taskDist(); // call the parent function again to wait for input
     }, 200); // wait 0.2 seconds before the computer makes its play
   }
-  function getPlayer() {return [(count === 0 || count % 2 === 0) ? 'B' : 'W', (count === 0 || count % 2 === 0) ? 'W' : 'B'];}
-  function hasWinner(winner) {$('.instr').text(`Game over, winner is ${winner}`);}
-  function findWinner() {
-    return (whiteTiles === blackTiles) ? 'Draw' : (whiteTiles > blackTiles) ? 'White' : 'Black'; // one line double turnary? it appears to work.
+  function getPlayer() {return [(count === 0 || count % 2 === 0) ? 'B' : 'W', (count === 0 || count % 2 === 0) ? 'W' : 'B'];} // find out whose turn it is, could probably refactor to use this more
+  function hasWinner(winner) {$('.instr').text(`Game over, winner is ${winner}`);} // update the DOM with winner
+  function findWinner() { // find the winner or if it's a draw
+    return (whiteTiles === blackTiles) ? 'Draw' : (whiteTiles > blackTiles) ? 'White' : 'Black';
   }
-  function checkInput(e, player, enemy) {
+  function checkInput(e, player, enemy) { // this function differentiates between player and computer
     let row, col;
-    if (e) { // if e hav been delivered by a click event, either event or undefined
-      if (!$(e.target).hasClass('clicked')) {
-        row = e.target.id.split('')[0];
+    if (e) { // if e has been delivered by a click event, it was the user, if e is undefined it's the com
+      if (!$(e.target).hasClass('clicked')) { // check if it's an N square
+        row = e.target.id.split('')[0]; // convert the id of the clicked square to row and col
         col = parseInt(e.target.id.split('')[1]);
-        count++;
-        const choice = getChips(row, col, player, boardModel, keys);
-        (choice.length > 0) ? play(player, enemy, row, col, choice) : count--;
-      }
+        count++; // initially increment
+        const chipsToFlip = getChips(row, col, player, boardModel, keys); // check the user choice
+        (chipsToFlip.length > 0) ? play(player, enemy, row, col, chipsToFlip) : count--;
+      } // ^^ either play if chosen square is valid, or do nothing and wait for another click
     } else { // if e is undefined, it was the computer that sent a request
-      count++;
-      const cpResponse = computerPlay(player, boardModel, keys);
+      count++; // always increment the count because com never misclicks
+      const cpResponse = computerPlay(player, boardModel, keys); // this is whichever square the computer has chosen
       if (cpResponse.length > 0) {
-        row = cpResponse.split('')[1];
+        row = cpResponse.split('')[1]; // I convert the com choice id to coordinates here
         col = parseInt(cpResponse.split('')[2]);
-        const choice = getChips(row, col, player, boardModel, keys);
-        return (choice.length > 0) ? play(player, enemy, row, col, choice) : $('#W').text('No legal moves');
-      } // else count++;
+        const chipsToFlip = getChips(row, col, player, boardModel, keys); // check com choice the same as for players
+        return (chipsToFlip.length > 0) ? play(player, enemy, row, col, chipsToFlip) : $('#W').text('No legal moves'); // this return either plays the computers choice or skips a turn
+      }
     } // hasClass 'clicked'
   } // end of check input function
   function play(player, enemy, row, col, chipsToFlip) {
-    boardModel[row][col] = player;
-    doFlip(enemy, player, chipsToFlip);
-    numTiles();
-    tileAndDOM(player, enemy, row, col);
+    boardModel[row][col] = player; // update the local boardModel with the recently placed chip
+    doFlip(enemy, player, chipsToFlip); // flip the chips
+    numTiles(); // update the scores
+    tileAndDOM(player, enemy, row, col); // see below
   }
   function tileAndDOM(player, enemy, row, col) {
-    const nPlayer = (player === 'W') ? 'White' : 'Black';
+    const nPlayer = (player === 'W') ? 'White' : 'Black'; // switch B to Black because I'm gonna use them
     const nEnemy = (player === 'W') ? 'Black' : 'White';
-    $(`#${row}${col}`).removeClass('N').addClass(player+' clicked');
+    $(`#${row}${col}`).removeClass('N').addClass(player+' clicked'); // change the color and block further clicks
     $(`#${enemy}`).text(`${nEnemy}, Your turn`);
-    $(`#${player}`).text(`${nPlayer} team`);
+    $(`#${player}`).text(`${nPlayer} team`); // say whose turn it is
     $('#counterL').text('Tiles: '+blackTiles);
-    $('#counterR').text('Tiles: '+whiteTiles);
+    $('#counterR').text('Tiles: '+whiteTiles); // update both tile counters every turn
   }
-  function numTiles() {
-    let blks = 0;
+  function numTiles() { // this retrieves the numer of tiles at any time for each player
+    let blks = 0; // increment these ones
     let whts = 0;
     for (var i=0; i<keys.length; i++) {
       for (var j=0; j<boardModel[keys[i]].length; j++) {
@@ -138,97 +131,102 @@ $(() => {
         if (boardModel[keys[i]][j] === 'W') whts++;
       }
     }
-    blackTiles = blks;
-    whiteTiles = whts;
+    blackTiles = blks; // update the global versions
+    whiteTiles = whts; // not incrementing, reassigning
   }
-  function doFlip(enemy, player, chipsToFlip) {
+  function doFlip(enemy, player, chipsToFlip) { // chipsToFlip === getChips()
     for (let i=0; i<chipsToFlip.length; i++) {
-      if (!$(chipsToFlip[i]).hasClass('N')) {
-        const thisChip = chipsToFlip[i].split('');
-        boardModel[thisChip[1]][thisChip[2]] = player;
-        switchClass(chipsToFlip[i], player, enemy);
+      if (!$(chipsToFlip[i]).hasClass('N')) { // just to be absolutely sure
+        const thisChip = chipsToFlip[i].split(''); // array of ['#',key,row] for the boardModel
+        boardModel[thisChip[1]][thisChip[2]] = player; // update said boardModel
+        switchClass(chipsToFlip[i], player, enemy); // switches chips from enemy to player
       }
     }
   } // end of doFlip function
-  function switchClass(squareId, player, enemy) {
+  function switchClass(squareId, player, enemy) { // does what it says on the tin, jQuery is simple enough
     $(squareId).removeClass(enemy);
     $(squareId).addClass(player);
   }
-  function getChips(row, col, player, board, keys) {
-    const goodChips = [];
-    const directions = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]];
-    const possiblePlanes = directions.map(direction => {
+  function getChips(row, col, player, board, keys) { // this one written by Alex, I watched intently
+    const goodChips = []; // I have changed it a bit, I want to return the chipsToFlip
+    const directions = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]; // N, NE, E, SE, S, SW, W, NE
+    // These directions represent how far you have to go to get to the next square
+    const possiblePlanes = directions.map(direction => { // array.map() returns a list
       const rowChange = direction[0];
-      const colChange = direction[1];
-      let plane  = [];
-      let newRow = row;
+      const colChange = direction[1]; // how much row and col will change each loop
+      let plane  = []; // holds the axis for each loop that will be checked for takeable pieces
+      let newRow = row; // declare these outside the loop so it can scan along an axis
       let newCol = col;
-      for (let j = 0; j < 7; j++) {
-        const rowIndex   = keys.indexOf(newRow);
-        newRow           = keys[rowIndex + rowChange];
-        newCol           = newCol + colChange;
-        const nextSquare = board[newRow] ? board[newRow][newCol] : undefined;
-        if (invalidMove(newRow, newCol, nextSquare)) {
-          plane = [];
-          break;
-        } else if (nextSquare === player) {
-          break;
+      for (let j = 0; j < 7; j++) { // limit to 6 pieces takeable on any one axis, will stop scanning if there are no takeable pieces adjacent
+        const rowIndex   = keys.indexOf(newRow); // because I used letters instead of nubmers in boardModel
+        newRow           = keys[rowIndex + rowChange]; // apply the change for this loop to move along the axis
+        newCol           = newCol + colChange; // apply the change for this loop to move along the axis
+        const nextSquare = board[newRow] ? board[newRow][newCol] : undefined; // sometimes reading an object using undefined as a key or index returns an error
+        // also ^^ return 'N', 'B' or 'W', next square along the axis
+        if (invalidMove(newRow, newCol, nextSquare)) { // returns boolean
+          plane = []; // if there are no legal moves along an axis empty the axis array
+          break; // then escape the loop to stop looking
+        } else if (nextSquare === player) { // then keep the axis array
+          break; // then escape the loop
         }
-        if (checkLength(plane, newCol, newRow)) {
-          plane = [];
-          break;
+        if (checkLength(plane, newCol, newRow)) { // I wrote this check to prevent some illegal moves
+          plane = []; // it's on the run up to the edge, it would take the row, even if there was no flanking
+          break; // like there was a players piece off the board but still in play
         }
-        plane.push(`#${newRow}${newCol}`);
+        plane.push(`#${newRow}${newCol}`); // if it didn't escape the loop, add this array to the array of arrays
       }
-      if (plane.toString()) return plane;
-    }).filter(Boolean);
-    possiblePlanes.forEach(plane => {
-      plane.forEach(id => {
-        goodChips.push(id);
-      });
+      if (plane.toString()) return plane; // if it has values return the array
+    }).filter(Boolean); // I think this removes any undefined variables
+    possiblePlanes.forEach(plane => { // for each axis in the array of arrays
+      plane.forEach(id => { // for each id in each axis
+        goodChips.push(id); // add to goodChips (chipsToFlip)
+      }); // We do this to cover all directions, you can take along multiple axis
     });
-    return goodChips;
+    return goodChips; // return the good chips to be flipped
   } // end of getChips function
-  function checkLength(plane, col, row) {return plane.length >= 6 && (col === 7 || col === 0 || row === 'a' || row === 'h');}
-  function invalidMove(row, col, square) {return validRow(row) || validColumn(col) || emptySquare(square);}
-  function validRow(row) {return typeof row === 'undefined';}
-  function validColumn(col) {return col > 7 || col < 0;}
-  function emptySquare(square) {return square === 'N';}
-  function computerPlay(player, board, keys) {
-    const thisChoice = getChoice(player, board, keys);
-    return thisChoice;
+  function checkLength(plane, col, row) {return plane.length >= 6 && (col === 7 || col === 0 || row === 'a' || row === 'h');} // I added this one to prevent some illegal moves
+  function invalidMove(row, col, square) {return validRow(row) || validColumn(col) || emptySquare(square);} // mother function for the three checks below
+  function validRow(row) {return typeof row === 'undefined';} // conditions to break
+  function validColumn(col) {return col > 7 || col < 0;} // conditions to break
+  function emptySquare(square) {return square === 'N';} // conditions to break
+  function computerPlay(player, board, keys) { /////////////// this is how the computer plays the game
+    return getChoice(player, board, keys); // just that one function that calls getChips (formerly isLegal)
   }
   function anyLegalMoves(player, board, keys) {
     const possible = getChoice(player, board, keys);
     return (possible.length > 0) ? true : false;
   }
-  function getChoice(player, board, keys) { // this function is pretty procedural, but it works.
-    let chipsThisTurn = [];
-    let counter = 0; // the counter is the highest score for any legal move,
-    const possibleSquares = [];
-    const abacus = {};
+  // this getChips function is a tough one, it does what I need it to, but I don't like it
+  // it finds the legal move with the highest score
+  function getChoice(player, board, keys) {
+    let chipsThisTurn = []; // stores flippable chips for each square
+    let topScorePerSq = 0; // the topScorePerSq is the highest score for any legal move,
+    const possibleSquares = []; // the highest scoring square / squares
+    const abacus = {}; // Dictionary of squares to potential scores
     for (let i=0; i<keys.length; i++) {
-      for (let j=0; j<board[keys[i]].length; j++) {
-        const thisId = '#'+keys[i]+(j).toString();
-        chipsThisTurn = getChips(keys[i], j, player, board, keys);
-        if (chipsThisTurn.length > 0) {
-          abacus[thisId] = chipsThisTurn.length;
-        }
-        chipsThisTurn = [];
+      for (let j=0; j<board[keys[i]].length; j++) { // looping every square
+        const thisId = '#'+keys[i]+(j).toString(); // taken from the boardModel
+        chipsThisTurn = getChips(keys[i], j, player, board, keys); // returns the flippable chips
+        if (chipsThisTurn.length > 0) abacus[thisId] = chipsThisTurn.length; // if 1 or more, add to abacus
+        chipsThisTurn = []; // empty for next square
       }
     }
     const resultKeys = Object.keys(abacus);
     for (let i=0; i<resultKeys.length; i++) {
-      if (abacus[resultKeys[i]] > counter) if ($(resultKeys[i]).hasClass('N')) counter = abacus[resultKeys[i]];
-    }
-    for (let i=0; i<resultKeys.length; i++) {
-      if (abacus[resultKeys[i]] === counter) {
-        if ($(resultKeys[i]).hasClass('N')) {
-          possibleSquares.push(resultKeys[i]);
+      if (abacus[resultKeys[i]] > topScorePerSq) { // find the highest scores
+        if ($(resultKeys[i]).hasClass('N')) { // can only place on N squares, sometimes B or W score very high
+          topScorePerSq = abacus[resultKeys[i]]; // store the highest scores
         }
       }
     }
-    return possibleSquares[0];
+    for (let i=0; i<resultKeys.length; i++) {
+      if (abacus[resultKeys[i]] === topScorePerSq) {
+        if ($(resultKeys[i]).hasClass('N')) { // if I don't do this check it freaks out and flips B and W squares
+          possibleSquares.push(resultKeys[i]); // push all squares that match the highest score
+        }
+      }
+    }
+    return possibleSquares[0]; // return the first one, tends to the top left of the board
   }
-  landingPage();
+  landingPage(); // start the whole thing
 }); // end of document ready
