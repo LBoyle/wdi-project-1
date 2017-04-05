@@ -1,15 +1,11 @@
 body {
-  /*background-image: url("/Users/louis/Development/wdi-project-1/img/wood-table-bg.jpg");*/
-  background-image: url("https://infinite-meadow-13142.herokuapp.com/img/wood-table-bg.jpg");
+  background-image: url("/Users/louis/Development/wdi-project-1/img/burr-walnut.jpg");
+  /*background-image: url("https://infinite-meadow-13142.herokuapp.com/img/wood-table-bg.jpg");*/
   background-color: #B8860B;
   text-shadow: 1px 1px grey;
   text-align: center;
   font-family: sans-serif;
 }
-/*p {
-  color: white;
-  text-shadow: 2px 2px black;
-}*/
 main {
   width: 416px;
   height: 416px;
@@ -19,13 +15,12 @@ main {
   border-radius: 10px;
 }
 footer {
-
   color: white;
   text-align: center;
-
 }
 .box {
   /*margin: 0 0 -4px 0;*/
+  /* if I want to get rid of the squarenumbers, use the margin -4 */
   height: 50px;
   width: 50px;
   border: 1px solid black;
