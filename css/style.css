@@ -1,5 +1,6 @@
 body {
-  background-image: url("/Users/louis/Development/wdi-project-1/img/wood-table-bg.jpg");
+  /*background-image: url("/Users/louis/Development/wdi-project-1/img/wood-table-bg.jpg");*/
+  background-image: url("https://infinite-meadow-13142.herokuapp.com/img/wood-table-bg.jpg");
   background-color: #B8860B;
   text-shadow: 1px 1px grey;
   text-align: center;
@@ -65,7 +66,8 @@ footer {
   width: 424px;
   height: 424px;
   margin: 0 auto;
-  background-image: url("/Users/louis/Development/wdi-project-1/img/board.png");
+  /*background-image: url("/Users/louis/Development/wdi-project-1/img/board.png");*/
+  background-image: url("https://infinite-meadow-13142.herokuapp.com/img/board.png");
   background-repeat: no-repeat;
 }
 .modeBtn {
