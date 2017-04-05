@@ -12,7 +12,6 @@ $(() => {
     const ids = ['pvp', 'pvc', 'cvc'];
     const btnText = ['Player vs Player','Player vs Com','Com vs Com'];
     for (var i = 0; i < ids.length; i++) {
-      const $modeBtn =
       $welcome.append($(document.createElement('p')).addClass('modeBtn').attr('id',ids[i]).html(btnText[i]));
     }
     $body.append($header, $instr, $welcome);
@@ -23,6 +22,7 @@ $(() => {
     });
   }
   function createBoard() {
+    const keys = ['a','b','c','d','e','f','g','h'];
     const $scoreLeft = $(document.createElement('div')).addClass('scoreLeft');
     const $scoreRight = $(document.createElement('div')).addClass('scoreRight');
     const $titleLeft = $(document.createElement('h3')).attr('id','B').text('Black, to start');
@@ -124,8 +124,7 @@ $(() => {
   function tileAndDOM(player, enemy, row, col) {
     const nPlayer = (player === 'W') ? 'White' : 'Black';
     const nEnemy = (player === 'W') ? 'Black' : 'White';
-    $(`#${row}${col}`).removeClass('N');
-    $(`#${row}${col}`).addClass(player+' clicked');
+    $(`#${row}${col}`).removeClass('N').addClass(player+' clicked');
     $(`#${enemy}`).text(`${nEnemy}, Your turn`);
     $(`#${player}`).text(`${nPlayer} team`);
     $('#counterL').text('Tiles: '+blackTiles);
@@ -205,25 +204,23 @@ $(() => {
     return (possible.length > 0) ? true : false;
   }
   function getChoice(player, board, keys) { // this function is pretty procedural, but it works.
-    let possibleSquares = [];
     let chipsThisTurn = [];
+    let counter = 0; // the counter is the highest score for any legal move,
+    const possibleSquares = [];
     const abacus = {};
     for (let i=0; i<keys.length; i++) {
-      for (let j=0; j<8; j++) {
+      for (let j=0; j<board[keys[i]].length; j++) {
         const thisId = '#'+keys[i]+(j).toString();
         chipsThisTurn = getChips(keys[i], j, player, board, keys);
-        abacus[thisId] = chipsThisTurn.length;
+        if (chipsThisTurn.length > 0) {
+          abacus[thisId] = chipsThisTurn.length;
+        }
         chipsThisTurn = [];
       }
     }
-    let counter = 0; // the counter is the highest score for any legal move,
     const resultKeys = Object.keys(abacus);
     for (let i=0; i<resultKeys.length; i++) {
-      if (abacus[resultKeys[i]] > counter) {
-        if ($(resultKeys[i]).hasClass('N')) {
-          counter = abacus[resultKeys[i]];
-        }
-      }
+      if (abacus[resultKeys[i]] > counter) if ($(resultKeys[i]).hasClass('N')) counter = abacus[resultKeys[i]];
     }
     for (let i=0; i<resultKeys.length; i++) {
       if (abacus[resultKeys[i]] === counter) {
@@ -232,7 +229,7 @@ $(() => {
         }
       }
     }
-    return (abacus[this.chosenSquare] === 0) ? [] : possibleSquares[0];
+    return possibleSquares[0];
   }
   landingPage();
 }); // end of document ready
