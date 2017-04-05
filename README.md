@@ -8,12 +8,10 @@ http://radagast.se/othello/Help/strategy.html
 Check it out here:
 https://infinite-meadow-13142.herokuapp.com/
 
-So as of right now, it's still MVP, it's in PvC mode, Player has the black pieces, Computer has white. 
+I think it's past MVP now, I've refactored from over 600 lines of JS to less than 250, I won a beer. More refactoring to do, also yet to convert it to OOP.
 
-Player goes first, but then also has to click any green tile to initiate the Computer.
-It's still bound to the click event, but it works. 
+I haven't sacrificed any functionality, in fact I've added more, no illegal moves get through, which was the big challenge with the refactor, I've learned a lot about efficiency and what short, concise, elegant JS looks like.
 
-Also, there are no win conditions yet, the game doesn't know when it's over, it just soft-locks, you can't place pieces. 
+Got rid of the prompt, it's at this point I'm going to start thinking about styling, or rather stop thinking about the logic.
 
-PvP also works very well, I'm thinking about refactoring into OOP as I design it now, you'll be able to choose mode etc.
-Like Computer vs its self, which should be a laugh, or a laptop benchmark. 
+Enjoying this project thoroughly.

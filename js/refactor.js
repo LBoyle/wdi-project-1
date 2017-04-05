@@ -1,4 +1,3 @@
-var CP = CP;
 $(() => {
   let gameMode = '';
   let blackTiles, whiteTiles, count = 0;
