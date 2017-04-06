@@ -6,7 +6,7 @@ $(() => {
   const boardModel = {}; // a model of the board right now, updated every turn
   function landingPage() { // that screen where you choose the game mode
     const $header = $('<h1>').text('Othello / Reversi');
-    const $instr = $('<p>', {class: 'instr'}).text('Logical JavaScript');
+    const $instr = $('<p>', {class: 'instr'}).text('Logic heavy JavaScript game');
     const $welcome = $('<div>', {class: 'welcome'}); // make some stuff, I like jQuery
     const ids = ['pvp', 'pvc', 'cvc']; ////////////////// ids for mode buttons
     const btnText = ['Player vs Player','Player vs Com','Com vs Com']; // text to display in mode buttons
@@ -159,7 +159,7 @@ $(() => {
     }
   } // end of doFlip function
   function switchClass(squareId, player, enemy) { // does what it says on the tin, jQuery is simple enough
-    // const rowCol = sdquareId.split('');
+    (!$(squareId+'chip').hasClass('translate')) ? $(squareId+'chip').addClass('translate') : $(squareId+'chip').removeClass('translate');
     $(squareId).removeClass(enemy).addClass(player);
   }
   function getChips(row, col, player, board, keys) { // this one written by Alex, I watched intently

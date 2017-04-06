@@ -34,6 +34,15 @@ main:hover {
   height: 100%;
   width: 100%;
   border-radius: 50%;
+  transform-style: preserve-3d;
+  transition: all 0.3s linear;
+}
+.translate {
+  transform-style: preserve-3d;
+  transition: all 0.3s linear;
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  transform: rotateY(180deg);
 }
 #a0 {
   border-radius: 5px 0 0 0;
@@ -62,15 +71,9 @@ main:hover {
 .B > .chip{
   background-color: black;
   text-shadow: 2px 2px black;
-  /*transform-style: preserve-3d;*/
-  /*transition: all 0.5s linear;*/
-  /*transform: rotateY(180deg);*/
 }
 .W > .chip{
   background-color: white;
-  /*transform-style: preserve-3d;*/
-  /*transition: all 0.5s linear;*/
-  /*transform: rotateY(180deg);*/
 }
 .scoreLeft {
   background-color: black;
