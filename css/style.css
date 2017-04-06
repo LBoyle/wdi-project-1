@@ -22,7 +22,7 @@ main {
   border: 3px solid rgb(60, 40, 20);
 }
 main:hover {
-  cursor: url('../img/othello-B.png'), auto;
+  cursor: url('../img/praise-B.png'), auto;
 }
 .box {
   margin: 0 0 -4px 0;
