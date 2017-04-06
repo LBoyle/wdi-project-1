@@ -1,14 +1,13 @@
 body {
   /*background-image: url("/Users/louis/Development/wdi-project-1/img/burr-walnut.jpg");*/
-  background-image: url("https://infinite-meadow-13142.herokuapp.com/img/burr-walnut.jpg");
+  background-image: url("../img/burr-walnut.jpg");
   background-color: #B8860B;
   text-shadow: 1px 1px grey;
   text-align: center;
   font-family: sans-serif;
 }
 main {
-  width: 416px;
-  height: 416px;
+  /* height and width is set from the JS */
   margin: 0 auto 10px auto;
   background-color: rgb(64, 85, 34);
   border: 3px solid rgb(60,40,20);
@@ -23,12 +22,27 @@ footer {
   /* if I want to get rid of the squarenumbers, use the margin -4 */
   height: 50px;
   width: 50px;
-  border: 1px solid black;
-  border-radius: 5px;
+  border: 1px solid rgb(40, 60, 20);
+  /*border-radius: 5px;*/
   display: inline-block;
+}
+#a0 {
+  border-radius: 5px 0 0 0;
+}
+#a7 {
+  border-radius: 0 5px 0 0;
+}
+#h7 {
+  border-radius: 0 0 5px 0;
+}
+#h0 {
+  border-radius: 0 0 0 5px;
 }
 .N:hover {
   background-color: rgba(40, 50, 20, 0.8);
+}
+.legal:hover {
+  background-color: rgba(40, 255, 20, 0.3);
 }
 .instr {
   color: white;
@@ -62,7 +76,7 @@ footer {
   height: 424px;
   margin: 0 auto;
   /*background-image: url("/Users/louis/Development/wdi-project-1/img/board.png");*/
-  background-image: url("https://infinite-meadow-13142.herokuapp.com/img/board.png");
+  background-image: url("../img/board.png");
   background-repeat: no-repeat;
 }
 .modeBtn {

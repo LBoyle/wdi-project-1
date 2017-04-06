@@ -29,7 +29,8 @@ $(() => {
     const $counterR = $('<p>', {id: 'counterR'}).text('Tiles: 2');
     $scoreLeft.append($titleLeft, $counterL);
     $scoreRight.append($titleRight, $counterR); // join them all together
-    const $main = $('<main>'); // create the box that holds the game board
+    const boardSize = (keys.length*50)+(keys.length*2); // allows for adaptive size, like 9x9 grid etc, not recommended, the logic still has magic numbers, the init squares are no longer in the center
+    const $main = $('<main>', {width: boardSize, height: boardSize}); // create the box that holds the game board
     for (var i=0; i<keys.length; i++) { // first loop through keys
       boardModel[keys[i]] = []; // make a space in the dictionary for each key
       for (var j=0; j<keys.length; j++) { // then loop through 8 to create each square
@@ -50,6 +51,7 @@ $(() => {
   }
   function taskDist() { // this move switches game modes as chosen py the user
     if ($('.N').length > 0) { // if there are free playable squares,
+      $('.legal').removeClass('legal');
       if (gameMode === 'pvp') {
         $('.instr').text('Player vs Player'); // these update the DOM
         playerController(); // call the function that handles players only
@@ -63,7 +65,8 @@ $(() => {
     } else hasWinner(findWinner()); // if there are no N squares left the game is over
   } // don't know for certain about a win condition with empty sqares remaining, i think it's possible
   function playerController() { // not for computers
-    if (anyLegalMoves(getPlayer()[0], boardModel, keys)) { // returns boolean to find if player has legal moves
+    const legals = anyLegalMoves(getPlayer()[0], boardModel, keys, true); // isPlayer === true
+    if (legals.length > 0) { // returns boolean to find if player has legal moves
       $('.box').on('click', (e) => { // click event on all squares
         checkInput(e, getPlayer()[0], getPlayer()[1]); // run the game logic, [0] is player [1] is enemy
         $('.box').off(); // disable the click event so player can't interrupt the computer
@@ -157,19 +160,19 @@ $(() => {
       let plane  = []; // holds the axis for each loop that will be checked for takeable pieces
       let newRow = row; // declare these outside the loop so it can scan along an axis
       let newCol = col;
-      for (let j = 0; j < 7; j++) { // limit to 6 pieces takeable on any one axis, will stop scanning if there are no takeable pieces adjacent
+      for (let j = 0; j < keys.length-1; j++) { // limit to 6 pieces takeable on any one axis, will stop scanning if there are no takeable pieces adjacent
         const rowIndex   = keys.indexOf(newRow); // because I used letters instead of nubmers in boardModel
         newRow           = keys[rowIndex + rowChange]; // apply the change for this loop to move along the axis
         newCol           = newCol + colChange; // apply the change for this loop to move along the axis
         const nextSquare = board[newRow] ? board[newRow][newCol] : undefined; // sometimes reading an object using undefined as a key or index returns an error
         // also ^^ return 'N', 'B' or 'W', next square along the axis
-        if (invalidMove(newRow, newCol, nextSquare)) { // returns boolean
+        if (invalidMove(newRow, newCol, nextSquare, keys)) { // returns boolean
           plane = []; // if there are no legal moves along an axis empty the axis array
           break; // then escape the loop to stop looking
         } else if (nextSquare === player) { // then keep the axis array
           break; // then escape the loop
         }
-        if (checkLength(plane, newCol, newRow)) { // I wrote this check to prevent some illegal moves
+        if (checkLength(plane, newCol, newRow, keys)) { // I wrote this check to prevent some illegal moves
           plane = []; // it's on the run up to the edge, it would take the row, even if there was no flanking
           break; // like there was a players piece off the board but still in play
         }
@@ -184,21 +187,24 @@ $(() => {
     });
     return goodChips; // return the good chips to be flipped
   } // end of getChips function
-  function checkLength(plane, col, row) {return plane.length >= 6 && (col === 7 || col === 0 || row === 'a' || row === 'h');} // I added this one to prevent some illegal moves
-  function invalidMove(row, col, square) {return validRow(row) || validColumn(col) || emptySquare(square);} // mother function for the three checks below
+  function checkLength(plane, col, row, keys) {return plane.length >= 6 && (col === keys.length-1 || col === 0 || row === 'a' || row === keys[keys.length-1]);} // I added this one to prevent some illegal moves
+  function invalidMove(row, col, square, keys) {return validRow(row) || validColumn(col, keys) || emptySquare(square);} // mother function for the three checks below
   function validRow(row) {return typeof row === 'undefined';} // conditions to break
-  function validColumn(col) {return col > 7 || col < 0;} // conditions to break
+  function validColumn(col, keys) {return col > keys.length-1 || col < 0;} // conditions to break
   function emptySquare(square) {return square === 'N';} // conditions to break
   function computerPlay(player, board, keys) { /////////////// this is how the computer plays the game
-    return getChoice(player, board, keys); // just that one function that calls getChips (formerly isLegal)
-  }
-  function anyLegalMoves(player, board, keys) {
-    const possible = getChoice(player, board, keys);
-    return (possible.length > 0) ? true : false;
+    return getChoices(player, board, keys, false)[0]; // just that one function that calls getChips (formerly isLegal) // isPlayer === false
+  } // I was selecting the first item inside getChoices, but I decided to return a list to apply a class
+  function anyLegalMoves(player, board, keys, isPlayer) {
+    const possible = getChoices(player, board, keys, isPlayer); // isPlayer is a magic number, or boolean
+    for (var i = 0; i < possible.length; i++) {
+      $(possible[i]).addClass('legal'); // legal moves show up green on :hover
+    }
+    return possible; // changed to return all possible squares, even low scoring ones
   }
   // this getChips function is a tough one, it does what I need it to, but I don't like it
   // it finds the legal move with the highest score
-  function getChoice(player, board, keys) {
+  function getChoices(player, board, keys, isPlayer) { // isPlayer is a magic number boolean
     let chipsThisTurn = []; // stores flippable chips for each square
     let topScorePerSq = 0; // the topScorePerSq is the highest score for any legal move,
     const possibleSquares = []; // the highest scoring square / squares
@@ -219,14 +225,24 @@ $(() => {
         }
       }
     }
-    for (let i=0; i<resultKeys.length; i++) {
-      if (abacus[resultKeys[i]] === topScorePerSq) {
-        if ($(resultKeys[i]).hasClass('N')) { // if I don't do this check it freaks out and flips B and W squares
-          possibleSquares.push(resultKeys[i]); // push all squares that match the highest score
+    if (!isPlayer) { // if it's the the player return the highest scoring chips to choose from
+      for (let i=0; i<resultKeys.length; i++) {
+        if (abacus[resultKeys[i]] === topScorePerSq) {
+          if ($(resultKeys[i]).hasClass('N')) { // if I remove check it freaks out and flips the wrong squares
+            possibleSquares.push(resultKeys[i]); // push all squares that match the highest score
+          }
+        }
+      }
+    } else { // if it IS the player, return all possible squares that will score at least one
+      for (let i=0; i<resultKeys.length; i++) {
+        if (abacus[resultKeys[i]] > 0) {
+          if ($(resultKeys[i]).hasClass('N')) { // if I remove check it freaks out and flips the wrong squares
+            possibleSquares.push(resultKeys[i]); // push all squares that match the highest score
+          }
         }
       }
     }
-    return possibleSquares[0]; // return the first one, tends to the top left of the board
+    return possibleSquares; // return the first one, tends to the top left of the board
   }
   landingPage(); // start the whole thing
 }); // end of document ready
