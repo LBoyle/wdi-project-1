@@ -234,7 +234,7 @@ var game = game || {
     const resultKeys = Object.keys(abacus);
     for (let i=0; i<resultKeys.length; i++) {
       if (abacus[resultKeys[i]] > topScorePerSq) { // find the highest scores
-        if ($(resultKeys[i]).hasClass('N')) { // can only place on N squares, sometimes B or W score very high
+        if ($(resultKeys[i]).hasClass('N')) { // can only place on N squares, sometimes B or W score very high, higher than any N squares
           topScorePerSq = abacus[resultKeys[i]]; // store the highest scores
         }
       }
@@ -254,7 +254,7 @@ var game = game || {
             possibleSquares.push(resultKeys[i]); // push all squares that match the highest score
           }
         }
-      }
+      } // this whole for loop didn't have to exist before the final refactor, it checks against a magic number, isPlayer
     }
     return possibleSquares; // return the first one, tends to the top left of the board
   }
