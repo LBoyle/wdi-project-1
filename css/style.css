@@ -1,30 +1,39 @@
 body {
-  /*background-image: url("/Users/louis/Development/wdi-project-1/img/burr-walnut.jpg");*/
   background-image: url("../img/burr-walnut.jpg");
   background-color: #B8860B;
-  text-shadow: 1px 1px grey;
-  text-align: center;
   font-family: sans-serif;
+}
+body, footer {
+  text-align: center;
+}
+h1, footer, .instr, .scoreLeft {
+  color: white;
+}
+.modeBtn, .scoreLeft, .scoreRight, .box {
+  display: inline-block;
+}
+main, .modeBtn {
+  border-radius: 10px;
 }
 main {
   /* height and width is set from the JS */
   margin: 0 auto 10px auto;
   background-color: rgb(64, 85, 34);
-  border: 3px solid rgb(60,40,20);
-  border-radius: 10px;
+  border: 3px solid rgb(60, 40, 20);
 }
-footer {
-  color: white;
-  text-align: center;
+main:hover {
+  cursor: url('../img/othello-B.png'), auto;
 }
 .box {
-  /*margin: 0 0 -4px 0;*/
-  /* if I want to get rid of the squarenumbers, use the margin -4 */
+  margin: 0 0 -4px 0;
   height: 50px;
   width: 50px;
   border: 1px solid rgb(40, 60, 20);
-  /*border-radius: 5px;*/
-  display: inline-block;
+}
+.chip {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
 }
 #a0 {
   border-radius: 5px 0 0 0;
@@ -44,69 +53,50 @@ footer {
 .legal:hover {
   background-color: rgba(40, 255, 20, 0.3);
 }
-.instr {
-  color: white;
-}
 .scoreLeft, .scoreRight {
-  display: inline-block;
   width: 195px;
   margin: 20px 10px 0 10px;
-  background-color: rgb(64, 85, 34);
-  border: 3px solid rgb(60,40,20);
+  border: 3px solid rgb(60, 40, 20);
   border-radius: 10px;
 }
-.scoreLeft, .B {
+.B > .chip{
   background-color: black;
-  color: white;
   text-shadow: 2px 2px black;
+  /*transform-style: preserve-3d;*/
+  /*transition: all 0.5s linear;*/
+  /*transform: rotateY(180deg);*/
 }
-.scoreRight, .W {
+.W > .chip{
   background-color: white;
-  color: black;
+  /*transform-style: preserve-3d;*/
+  /*transition: all 0.5s linear;*/
+  /*transform: rotateY(180deg);*/
 }
 .scoreLeft {
+  background-color: black;
   background-color: rgba(0,0,0,0.7);
 }
 .scoreRight {
+  background-color: white;
   background-color: rgba(255,255,255,0.7);
+  color: black;
 }
 .welcome {
   padding-top: 50px;
   width: 424px;
   height: 424px;
   margin: 0 auto;
-  /*background-image: url("/Users/louis/Development/wdi-project-1/img/board.png");*/
   background-image: url("../img/board.png");
   background-repeat: no-repeat;
 }
 .modeBtn {
-  display: inline-block;
   padding: 22px;
   margin: 20px;
   width: 150px;
-  /*height: 50px;*/
   background-color: rgb(255,255,255);
   background-color: rgba(255,255,255,0.7);
   border: 2px solid black;
-  border-radius: 10px;
 }
-/*#pvp, #pvc, #cvc {
-  padding-top: 10px;
-  padding-bottom: -10px;
-}*/
 .modeBtn:hover {
   background-color: rgb(255,255,255);
-}
-@media screen and (max-width: 500px) {
-  main {
-    width: 369px;
-    height: 369px;
-  }
-  .box {
-    width: 44px;
-    height: 44px;
-  }
-  .scoreLeft, .scoreRight {
-    width: 166px;
-  }
 }
